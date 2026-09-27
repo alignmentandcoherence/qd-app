@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>Q'd</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Limelight&family=Instrument+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  /* Moviebuff look: a repertory cinema at night. Projection-booth black, film-leader cream, tungsten marquee amber. */
+  --bg:#0E0B09; --surface:#18130F; --surface2:#241C15; --line:#3A2E24;
+  --text:#F3E9D8; --muted:#BAA993; --dim:#9A8670;
+  --accent:#E9A93B; --on-accent:#1A1004;
+  --good:#7BC98F; --bad:#E5533D;
+  --display:"Limelight", "Didot", Georgia, serif;
+  --body:"Instrument Sans", system-ui, -apple-system, sans-serif;
+  --mono:"Courier Prime", "Courier New", ui-monospace, monospace;
+}
+body[data-genre="Horror"]{--accent:#E0503F;--on-accent:#1A0503}
+body[data-genre="Comedy"]{--accent:#E9A93B;--on-accent:#1A1004}
+body[data-genre="Sci-Fi"]{--accent:#5CC6D8;--on-accent:#061A1E}
+body[data-genre="Romance"]{--accent:#E88AA8;--on-accent:#2A0916}
+body[data-genre="Drama"]{--accent:#B7A0F0;--on-accent:#150C2E}
+body[data-genre="Thriller"]{--accent:#EE8C45;--on-accent:#221003}
+body[data-genre="Action"]{--accent:#F2C94C;--on-accent:#221A02}
+body[data-genre="Crime"]{--accent:#8FB8DE;--on-accent:#08192A}
+html,body{height:100%}
+body{background:radial-gradient(120% 50% at 50% -6%,rgba(233,169,59,.14),transparent 62%) no-repeat var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.45;padding-inline:0}
+/* film grain */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:80;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+.app{max-width:440px;margin:0 auto;min-height:100%;padding:0 16px calc(96px + env(safe-area-inset-bottom,0px));position:relative}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px 10px}
+.brand{margin:0;font-weight:400;font-family:var(--display);font-size:34px;line-height:1;letter-spacing:1px;color:var(--accent);transition:color .3s;text-shadow:0 0 22px color-mix(in srgb,var(--accent) 40%,transparent)}
+.brand small{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-top:6px;font-weight:700;text-shadow:none}
+.topr{display:flex;align-items:center;gap:8px}
+.statpill{font-family:var(--mono);font-size:12px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);white-space:nowrap}
+.statpill b{color:var(--text)}
+.iconbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--muted);padding:0}
+.iconbtn[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+.iconbtn svg{width:18px;height:18px}
+.view{display:flex;flex-direction:column;gap:14px}
+details.more{display:flex;flex-direction:column;gap:12px}
+details.more>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+details.more[open]{display:flex;flex-direction:column;gap:14px}
+#detail{display:flex;flex-direction:column;gap:14px}
+.fighth{margin:4px 0 -4px;font-family:var(--display);font-weight:400;font-size:20px}
+.fightrow{display:flex;flex-direction:column;gap:6px}.fightrow .label b{color:var(--text);text-transform:none;letter-spacing:0;font-family:var(--body)}
+.rail.fight{gap:10px;margin-inline:-16px;padding:4px 16px 6px}
+.fighter{flex:none;width:84px;scroll-snap-align:start;background:none;border:0;padding:0;display:flex;flex-direction:column;gap:4px;text-align:left;font-size:12px;line-height:1.2;color:var(--muted)}
+.fighter .poster{border-radius:8px;outline:3px solid transparent;outline-offset:2px;transition:outline-color .15s}
+.fighter[aria-pressed="true"] .poster{outline-color:var(--accent)}.fighter[aria-pressed="true"]{color:var(--text);font-weight:700}
+.fighter:disabled{opacity:.5}
+details.args summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;font-size:14px;color:var(--muted)}
+details.args[open]{display:flex;flex-direction:column;gap:12px}
+.tonight{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 16%,var(--surface)),var(--surface) 60%);border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:16px;padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px}
+.tonighthead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.tonight h2{margin:0;font-family:var(--display);font-weight:400;font-size:24px;line-height:1;color:var(--accent)}
+.tonight .judge{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.tonight #roastLine{margin:0;font-size:15px;line-height:1.4;color:var(--text)}
+.tbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.tbtns .btn{padding-inline:8px;white-space:nowrap}
+.btn.court{background:#F4EBD0;color:#2A2113}
+.btn.roast{background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding-inline:12px}
+.roastset summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:13px;font-weight:700;color:var(--muted)}
+.roastset[open]{display:flex;flex-direction:column;gap:10px;padding-bottom:4px}
+.roastset{display:flex;flex-direction:column;gap:8px}.roastset .btn{align-self:flex-start}
+.roastbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.roastrow{display:flex;gap:10px;align-items:center}
+.roastrow p{margin:0;font-size:14px;flex:1;color:var(--muted)}
+.roastrow p b{color:var(--text)}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;border-radius:8px;padding:6px 2px;font-size:12px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.seg button[data-lv="3"][aria-pressed="true"]{background:#C6392A;color:#fff}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:700;background:var(--surface2);color:var(--text)}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.danger{background:#C6392A;color:#fff}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.wide{width:100%;padding:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn .bi{width:18px;height:18px;flex:none}
+/* each kind of button has its own look */
+.btn.search{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn.search:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.btn.upload{background:transparent;border:1.5px dashed var(--muted);color:var(--text)}
+.btn.upload:hover{border-color:var(--accent);color:var(--accent)}
+.btn.ticket{background:#F3E9D8;color:#2A1B0C;border-radius:6px;position:relative;
+  -webkit-mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.btn.ticket::after{content:"";position:absolute;inset:5px 16px;border:1.5px dashed rgba(42,27,12,.35);border-radius:4px;pointer-events:none}
+.btn.ticket:hover{background:#FFF6E4}
+.twobtn{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.search{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-width:44px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:13px;color:var(--muted)}
+.filters{display:flex;flex-direction:column;gap:8px}
+.findrow{display:flex;gap:8px}.findrow .search{flex:1;min-width:0;min-height:44px}
+.fbtn{flex:none;background:var(--surface);border:1px solid var(--line)}
+.fbtn[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.fcount{background:var(--accent);color:var(--on-accent);border-radius:999px;font-size:12px;min-width:20px;height:20px;display:inline-grid;place-items:center;padding:0 6px}
+.fpanel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.samplebar{flex-direction:row!important;align-items:center;padding:4px 4px 4px 12px!important;gap:4px!important}
+.samplebar p{flex:1}.linkbtn.dim{color:var(--muted)}
+@media (max-width:420px){header.top{flex-wrap:nowrap}.statpill{display:none}.brand{font-size:30px}}
+.chip .n{font-family:var(--mono);font-size:11.5px;margin-left:4px;opacity:.75}
+.sortrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sortrow .fine{margin:0}
+.sortsel{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--muted);flex:none}
+.sortsel select{min-height:44px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 10px}
+.linkbtn{background:none;border:0;padding:0 6px;min-width:44px;color:var(--accent);font-weight:700;min-height:44px}
+.chip[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.slug{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);margin-bottom:-6px}
+.imdbline{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:6px}
+.shelf{display:flex;flex-direction:column;gap:8px;padding-top:8px}
+.shelf h2{margin:0;font-family:var(--display);font-weight:400;font-size:23px;line-height:1.1;text-wrap:balance}
+.rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-16px;padding:4px 16px 8px;scrollbar-width:none}
+.rail::-webkit-scrollbar{height:6px}.rail::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+.rail{scroll-padding-inline:16px;scrollbar-width:thin;scrollbar-color:var(--line) transparent;cursor:grab}
+.rail.dragging{cursor:grabbing;scroll-snap-type:none}
+.shelfhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.railnav{display:flex;gap:8px;flex:none}
+.railnav .iconbtn{width:38px;height:38px;font-size:22px;line-height:1;color:var(--text)}
+.railnav .iconbtn:disabled{opacity:.35;cursor:default}
+.pick{flex:none;width:128px;scroll-snap-align:start;background:none;border:0;padding:0;text-align:left;display:flex;flex-direction:column;gap:5px}
+.pick .poster{width:100%;box-shadow:0 10px 22px rgba(0,0,0,.5);transition:transform .2s}
+.pick:hover .poster{transform:translateY(-3px)}
+.pick b{font-size:14px;line-height:1.2}
+.pick .by{font-size:12px;color:var(--muted)}
+.pick .imdb{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent)}
+.pick q{font-size:12.5px;line-height:1.3;color:var(--muted);font-style:italic;quotes:none}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:left;width:100%}
+.poster{aspect-ratio:2/3;max-width:100%;border-radius:8px;display:flex;align-items:flex-end;padding:6px;font-family:var(--display);font-size:11px;line-height:1.05;color:#fff;overflow:hidden;position:relative}
+.poster::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 6px,transparent 6px 12px)}
+.poster span{position:relative;z-index:1;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.poster.has-img{padding:0;background:#111}.poster.has-img::after{display:none}.poster img{width:100%;height:100%;object-fit:cover;display:block}
+.card h3{margin:0;font-size:16px;line-height:1.2}
+.meta{font-size:12.5px;color:var(--muted);margin-top:3px}
+.gtag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;margin-top:6px;margin-right:4px}
+.want{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.want b{display:block;font-size:18px;color:var(--text)}
+.watched-badge{font-size:10px;font-weight:700;color:var(--good);letter-spacing:.08em;text-transform:uppercase}
+.empty{color:var(--muted);text-align:center;padding:24px 0}
+details.settings{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+details.settings summary{font-weight:700;font-size:14px;cursor:pointer;color:var(--muted)}
+details.settings .field{margin-top:10px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(14,11,9,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));z-index:20}
+nav.tabs .in{max-width:440px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+nav.tabs button{background:none;border:0;border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:var(--dim);display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-current="page"]{color:var(--accent)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.panel h2{margin:0;font-family:var(--display);font-weight:400;font-size:24px;line-height:1.1;text-wrap:balance}
+.panel p{margin:0;color:var(--muted)}
+.panel.hero-panel{border-color:var(--accent)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700}
+.field input,.field textarea,.field select{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{resize:vertical;min-height:70px}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed var(--line);border-radius:14px;padding:22px 12px;text-align:center;cursor:pointer;color:var(--muted);transition:border-color .2s}
+.drop:hover,.drop.over{border-color:var(--accent);color:var(--text)}
+.drop strong{color:var(--text);font-size:15px}
+.drop svg{width:28px;height:28px;color:var(--accent)}
+.tiktok{display:flex;flex-direction:column;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:left;width:100%}
+.tiktok.vid{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center}.tiktok .vt{display:flex;flex-direction:column;gap:6px}
+.needmore{border:1px dashed var(--accent);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}.needmore p{margin:0;color:var(--text)}
+.plats{display:flex;flex-wrap:wrap;gap:6px}.plats span{font-family:var(--mono);font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
+.tiktok .h{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tiktok .c{font-size:14px}
+.scan{height:6px;border-radius:6px;background:var(--surface2);overflow:hidden}
+.scan i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+.steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.steps li.done{color:var(--text)}
+.steps li.done::before{content:"✓ ";color:var(--good)}
+.steps li:not(.done)::before{content:"· "}
+.shotprev{max-height:220px;width:auto;max-width:100%;border-radius:10px;border:1px solid var(--line);align-self:center}
+.evidence{display:flex;flex-wrap:wrap;gap:6px}
+.evidence span{font-family:var(--mono);font-size:11.5px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px 8px;color:var(--muted)}
+.option{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:left;width:100%}
+.option:hover{border-color:var(--accent)}
+.conf{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.errmsg{color:var(--bad);font-size:14px;margin:0}
+.toast{display:flex;align-items:center;gap:12px;position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--text);color:var(--bg);border-radius:14px;padding:12px 16px;max-width:min(400px,calc(100% - 32px));font-size:14px;font-weight:500;transition:.3s;z-index:60;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
+.sheet{position:fixed;inset:0;background:var(--bg);z-index:30;overflow-y:auto;padding-top:env(safe-area-inset-top,0px)}
+.sheet .app{padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+.hero{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:end;padding-top:8px}
+.hero h1{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.02;margin:0;text-wrap:balance}
+.hero .poster{font-size:15px;padding:10px}
+.hero .poster.has-img{padding:0}
+.back{background:none;border:0;color:var(--muted);font-weight:700;padding:14px 0 6px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.svc{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:700;font-size:13px;background:var(--surface);text-decoration:none;color:var(--text)}
+.dots{display:flex;gap:6px}
+.dots button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.dots button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.link{color:var(--accent);font-weight:700;text-decoration:none}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:start}
+.vs .x{font-family:var(--display);font-size:22px;color:var(--accent);padding-top:30px}
+.verdict{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.verdict .judge{font-family:var(--display);font-size:18px;color:var(--accent)}
+.verdict q{font-size:15px;quotes:none}
+.gavel{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.exhibits{display:flex;flex-direction:column;gap:8px}
+.exhibit{background:#F4EBD0;color:#2A2113;border-radius:6px;padding:10px 12px 10px 14px;position:relative;box-shadow:0 4px 14px rgba(0,0,0,.35);transform:rotate(-.6deg);animation:slam .35s cubic-bezier(.2,1.6,.4,1)}
+.exhibit:nth-child(even){transform:rotate(.7deg)}
+.exhibit .tag{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#8A1C1C}
+.exhibit b{display:block;font-size:14.5px;margin:2px 0 4px}
+.exhibit ul{margin:0;padding-left:16px;font-size:13px;line-height:1.35}
+.exhibit .stamp{position:absolute;right:10px;top:8px;font-family:var(--display);font-size:13px;color:#C62828;border:2px solid #C62828;border-radius:4px;padding:0 5px;transform:rotate(8deg);opacity:.85}
+@keyframes slam{from{transform:scale(1.35) rotate(-4deg);opacity:0}to{opacity:1}}
+canvas{width:100%;max-width:100%;border-radius:14px;background:var(--bg);border:1px solid var(--line);touch-action:none;display:block}
+.scoreline{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.fine{font-size:12px;color:var(--dim)}
+.invite{display:flex;flex-direction:column;gap:10px}
+.subpoena{position:relative;display:flex;flex-direction:column;gap:4px;text-align:left;width:100%;background:#F4EBD0;color:#2A2113;border:0;border-radius:8px;padding:16px 16px 16px 18px;box-shadow:0 6px 18px rgba(0,0,0,.45),0 0 0 3px var(--accent);transform:rotate(-.8deg);transition:transform .15s}
+.subpoena:hover{transform:rotate(0) scale(1.01)}.subpoena:active{transform:scale(.98)}
+.subpoena:disabled{opacity:.7;cursor:default}
+.subpoena .tag{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8A1C1C}
+.subpoena b{font-family:var(--display);font-weight:400;font-size:26px;line-height:1.05;padding-right:90px}
+.subpoena .sub{font-size:13.5px;line-height:1.35;color:#4A3B26}
+.subpoena .stamp{position:absolute;right:12px;top:12px;font-family:var(--display);font-size:14px;color:#C62828;border:2px solid #C62828;border-radius:4px;padding:1px 6px;transform:rotate(9deg);opacity:.9;animation:stampin 2.4s ease-in-out 2}
+@keyframes stampin{0%,80%,100%{transform:rotate(9deg) scale(1)}88%{transform:rotate(9deg) scale(1.18)}}
+.linkrow{display:flex;gap:8px}
+.linkrow input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--mono);font-size:12px}
+.remote{border-color:var(--good)!important;opacity:.95}
+.howto{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+.imp{display:flex;flex-direction:column;gap:10px}
+.morebox{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.match{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.match .seg{width:100%}
+.mcard .mposter{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:24px 18px 110px;font-family:var(--display);font-size:30px;line-height:1.05;color:#fff;text-align:center;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.minfo .why{font-family:var(--body);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.deck{position:relative;width:min(260px,78%);max-width:100%;aspect-ratio:2/3;outline:none}
+.mcard{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 14px 30px rgba(0,0,0,.55);touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;--yes:0;--no:0;transition:transform .25s}
+.mcard:active{cursor:grabbing}
+.mcard:nth-last-child(2){transform:scale(.95) translateY(12px);filter:brightness(.7)}
+.mcard:nth-last-child(3){transform:scale(.9) translateY(24px);filter:brightness(.5)}
+.mcard img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.minfo{position:absolute;left:0;right:0;bottom:0;padding:48px 12px 12px;background:linear-gradient(transparent,rgba(0,0,0,.88) 45%);display:flex;flex-direction:column;gap:3px;color:#fff;text-align:left}
+.minfo b{font-size:17px;line-height:1.15}
+.minfo span{font-family:var(--mono);font-size:12px;color:#E9DCC8}
+.minfo q{font-size:12.5px;font-style:italic;quotes:none;color:#E9DCC8}
+.mst{position:absolute;top:18px;font-family:var(--display);font-size:28px;padding:2px 10px;border:3px solid;border-radius:6px;background:rgba(0,0,0,.35)}
+.mst.yes{left:14px;color:var(--good);transform:rotate(-14deg);opacity:var(--yes)}
+.mst.no{right:14px;color:var(--bad);transform:rotate(14deg);opacity:var(--no)}
+.matchbtns{display:flex;align-items:center;justify-content:center;gap:26px}
+.mbtn{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;border:2px solid currentColor;background:var(--surface);padding:0;box-shadow:0 6px 16px rgba(0,0,0,.4);transition:transform .12s}
+.mbtn:active{transform:scale(.9)}
+.mbtn svg{width:26px;height:26px}
+.mbtn.nope{color:var(--bad)}.mbtn.yes{color:var(--good)}
+.mcount{font-family:var(--mono);font-size:13px;color:var(--muted);min-width:64px}
+.msum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;border:1px dashed var(--line);border-radius:14px}
+.msum h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1.1}
+.msum p{margin:0;color:var(--muted);font-size:14px}
+.sharerow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.shareopt{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);text-decoration:none;font-size:11px;font-weight:600;text-align:center;line-height:1.15}
+.shareopt:hover{border-color:var(--accent)}
+.shareopt .dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px}
+/* shame overlay */
+.shame{position:fixed;inset:0;z-index:50;background:rgba(8,5,12,.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}
+.shame .alarm{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 6px var(--bad);animation:pulse 1s ease-in-out 3}
+@keyframes pulse{0%,100%{opacity:0}50%{opacity:1}}
+.chatwin{width:100%;max-width:400px;background:#F4F2F7;color:#1C1626;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.chathead{padding:14px 16px;border-bottom:1px solid #DDD7E6;text-align:center}
+.chathead b{display:block;font-size:15px}
+.chathead span{font-size:12px;color:#6D6480}
+.thread{padding:14px;display:flex;flex-direction:column;gap:8px;min-height:240px}
+.sys{align-self:center;font-size:11.5px;color:#6D6480;text-align:center;max-width:90%}
+.bub{max-width:82%;padding:9px 12px;border-radius:18px;font-size:14.5px;line-height:1.35;animation:pop .25s ease-out}
+.bub.me{align-self:flex-end;background:var(--accent);color:var(--on-accent);border-bottom-right-radius:6px}
+.bub.them{align-self:flex-start;background:#E3DEEA;border-bottom-left-radius:6px}
+.bub .who{display:block;font-size:11px;font-weight:700;color:#6D6480;margin-bottom:2px}
+.typing{display:inline-flex;gap:4px}
+.typing i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.4;animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{50%{opacity:1}}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.chatfoot{padding:12px 14px 16px;border-top:1px solid #DDD7E6;display:flex;flex-direction:column;gap:8px;text-align:center}
+.chatfoot p{margin:0;font-size:13px;color:#6D6480}
+.chatfoot .btn{background:#1C1626;color:#fff}
+/* quick wins from the UX audit: 44 pt touch targets everywhere */
+.btn,.seg button,.chip,.back,.svc,.field input,.field select,.linkrow input{min-height:44px}
+.iconbtn,.railnav .iconbtn,.dots button{width:44px;height:44px}
+.svc{display:inline-flex;align-items:center}
+.link{display:inline-flex;align-items:center;min-height:44px}
+details.settings summary{min-height:44px;display:flex;align-items:center}
+header.top{flex-wrap:wrap}header.top .topr{margin-left:auto}.brand small{white-space:nowrap}
+.chk{display:flex;gap:10px;align-items:center;min-height:44px;font-size:14px;font-weight:600}
+.chk input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.toast.act{pointer-events:auto}
+.toast .undo{flex:none;min-height:44px;min-width:64px;border:0;border-radius:10px;background:var(--bg);color:var(--text);font-weight:700;padding:0 14px}
+.samplebar{background:var(--surface2);border:1px dashed var(--accent);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.samplebar p{margin:0;font-size:14px;color:var(--muted)}.samplebar p b{color:var(--text)}
+.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+.empty .twobtn{margin-top:14px}
+.matchbtns{flex-direction:column;gap:8px}
+.mrow{display:flex;align-items:center;justify-content:center;gap:22px}
+.mbtn.undo{width:48px;height:48px;color:var(--muted)}.mbtn.undo svg{width:20px;height:20px}
+.mbtn:disabled{opacity:.35;cursor:default}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app" role="main">
+  <header class="top">
+    <h1 class="brand">Q'd<small>Saved from your feed. Judged by us.</small></h1>
+    <div class="topr">
+      <div class="statpill" id="stat"></div>
+      <button class="iconbtn" id="voiceBtn" aria-pressed="false" aria-label="Voice off" title="Voice on/off. Pick a different voice in Settings at the bottom of My list."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H3v6h3l5 4z"/><path id="wave" style="display:none" d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg></button>
+    </div>
+  </header>
+
+  <!-- LIST -->
+  <section class="view" id="v-list">
+    <div class="slug" title="A screenplay scene heading: INT. means interior (indoors), then the place, then the time of day.">INT. YOUR WATCHLIST – NIGHT</div>
+    <div class="samplebar" id="sampleBar" hidden>
+      <p><b>Sample saves</b> to try Q'd. Yours stay on this device.</p>
+      <button class="linkbtn" id="clearSamples" type="button">Remove</button><button class="linkbtn dim" id="keepSamples" type="button" aria-label="Keep the samples and hide this note">Hide</button>
+    </div>
+    <section class="tonight" aria-labelledby="tonightH">
+      <div class="tonighthead"><h2 id="tonightH">Tonight</h2><span class="judge">Judge Flix says</span></div>
+      <p id="roastLine" aria-live="polite"></p>
+      <div class="tbtns">
+        <button class="btn primary" id="tMatch" type="button"><svg class="bi" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.3-9.2C1.4 8.4 3.6 5 7 5c2 0 3.4 1.1 5 3 1.6-1.9 3-3 5-3 3.4 0 5.6 3.4 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg>Match me</button>
+        <button class="btn court" id="tCourt" type="button" aria-label="Take it to Court"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4l6 6-3 3-6-6zM11 7l-7 7 3 3 7-7M3 21h10"/></svg>Court</button>
+        <button class="btn roast" id="roastBtn" type="button"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-3 2-4 2-6 1 1 2 2 2 3 1-2 1-5 1-7z"/></svg><span id="roastTxt">Roast</span></button>
+      </div>
+    </section>
+    <div class="filters" id="filters">
+      <div class="findrow"><input class="search" id="q" type="search" placeholder="Search your list" aria-label="Search titles, captions and notes">
+        <button class="btn fbtn" id="filterBtn" type="button" aria-expanded="false" aria-controls="filterPanel"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filter<span class="fcount" id="fCount" hidden></span></button></div>
+      <div class="sortrow"><p class="fine" id="filterSum" aria-live="polite"></p></div>
+      <div class="fpanel" id="filterPanel" hidden>
+        <div class="seg" id="statusSeg" role="group" aria-label="Which saves to show"></div>
+        <div role="group" aria-labelledby="gLbl"><div class="label" id="gLbl" style="margin-bottom:6px">Genre</div><div class="chips" id="genreChips"></div></div>
+        <div role="group" aria-labelledby="lLbl"><div class="label" id="lLbl" style="margin-bottom:6px">Length</div><div class="chips" id="lenChips"></div></div>
+        <div class="sortrow"><label class="sortsel" for="sortBy">Sort<select id="sortBy"><option value="recent">Newest saves</option><option value="want">Most wanted</option><option value="short">Shortest first</option><option value="rating">Highest IMDb</option></select></label>
+          <button class="btn primary" id="filterDone" type="button">Show results</button></div>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+    <details class="settings">
+      <summary>Settings: roast level, voice and group chat</summary>
+      <div class="field roastset"><span class="label">Roast level</span>
+      <div class="seg" id="lvl" role="group" aria-label="Roast intensity">
+        <button data-lv="0">Polite</button><button data-lv="1">Sassy</button><button data-lv="2" aria-pressed="true">Savage</button><button data-lv="3">Unhinged</button>
+      </div>
+        <button class="btn danger" id="shameBtn"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></svg>Shame me</button>
+      </div>
+      <div class="field"><label for="voicePick">Voice for roasts and Judge Flix</label><select id="voicePick"><option value="">Automatic (deep judge voice)</option></select>
+        <button class="btn ghost" id="voiceTest" type="button"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/></svg>Test this voice</button>
+        <span class="fine">The list shows the voices installed on this device, so it's different on an iPhone, a Mac and a PC.</span></div>
+      <div class="field"><label for="yourName">Your name</label><input id="yourName" placeholder="Your first name"></div>
+      <div class="field"><label for="friends">Group chat members (comma separated)</label><input id="friends" value="Sam, Priya, Mom"></div>
+      <label class="chk"><input type="checkbox" id="autoShame"> Shame me automatically when 8 or more saves are unwatched</label>
+      <p class="fine" style="margin-top:4px">Nothing is ever actually sent. It just looks that way.</p>
+      <button class="btn ghost wide" id="resetDemo" type="button" style="margin-top:10px">Start over with the sample list</button>
+    </details>
+  </section>
+
+  <!-- DISCOVER -->
+  <section class="view" id="v-discover" hidden>
+    <div class="slug">EXT. THE VIDEO STORE – NIGHT</div>
+    <section class="shelf" aria-labelledby="shelfH">
+      <div class="label">The Moviebuff's shelf</div>
+      <div class="shelfhead"><h2 id="shelfH">Films your feed hasn't found yet</h2>
+        <div class="railnav"><button class="iconbtn" id="shelfPrev" type="button" aria-label="Scroll left" disabled>‹</button><button class="iconbtn" id="shelfNext" type="button" aria-label="Scroll right">›</button></div></div>
+      <p class="fine">Picked by a film nerd. Posters, IMDb ratings and directors come from OMDb. Tap one to save it.</p>
+      <div class="rail" id="shelf"></div>
+      <div class="morebox">
+        <div class="label">More films to discover</div>
+        <div class="seg" id="moreMode" role="group" aria-label="How to find more films"><button type="button" data-m="search" aria-pressed="false">Search</button><button type="button" data-m="match" aria-pressed="false">Match me</button></div>
+        <form id="moreForm" class="field" hidden>
+          <div class="linkrow"><input id="moreQ" maxlength="120" placeholder="e.g. slow-burn heist, 90s, Michelle Yeoh" aria-label="What are you in the mood for?"><button class="btn primary" id="moreGo" type="submit">Search</button></div>
+          <p class="fine">The Moviebuff (AI) suggests films from what it knows. It doesn't browse the live internet, so double-check where things stream.</p>
+          <div class="rail" id="moreRail"></div>
+        </form>
+        <div class="match" id="matchBox" hidden>
+          <div class="seg" id="matchMode" role="group" aria-label="What kind of matches"><button type="button" data-mm="random" aria-pressed="false">Random</button><button type="button" data-mm="tailored" aria-pressed="false">Tailored</button></div>
+          <p class="fine" id="matchPick">Random deals 10 wildcards from all over the map, including genres you never save. Tailored deals 10 close matches to what's already on your list.</p>
+          <p class="fine" id="matchHint" hidden>Swipe right to Q it, left to pass.</p>
+          <div class="deck" id="deck" tabindex="0" aria-label="Film cards. Use the left and right arrow keys to pass or save."></div>
+          <div class="matchbtns" id="matchBtns"><div class="mrow">
+            <button class="mbtn nope" id="mNope" type="button" aria-label="Pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            <button class="mbtn undo" id="mUndo" type="button" aria-label="Undo last swipe" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
+            <button class="mbtn yes" id="mYes" type="button" aria-label="Save to my list"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.3-9.2C1.4 8.4 3.6 5 7 5c2 0 3.4 1.1 5 3 1.6-1.9 3-3 5-3 3.4 0 5.6 3.4 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg></button>
+            </div><span class="mcount" id="mCount"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ADD -->
+  <section class="view" id="v-add" hidden>
+    <div class="slug">EXT. THE FOR YOU PAGE – CONTINUOUS</div>
+    <div class="panel hero-panel">
+      <h2>Screenshot to title</h2>
+      <p>Upload a screenshot from any short video: TikTok, Instagram Reels, YouTube Shorts, Facebook, Snapchat and more. AI reads the on-screen text and the scene, then finds the movie or show.</p>
+      <div class="plats" aria-label="Works with"><span>TikTok</span><span>Reels</span><span>Shorts</span><span>Facebook</span><span>Snapchat</span><span>Any video</span></div>
+      <label class="drop" id="drop" for="shot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+        <strong>Choose a screenshot</strong>
+        <span class="fine">or drop one here</span>
+      </label>
+      <input class="sr" type="file" id="shot" accept="image/jpeg,image/png,image/webp,image/gif">
+      <p class="fine" id="visionNote" hidden>Screenshot reading isn't available in this view. Open the page in the Claude app or on claude.ai.</p>
+    </div>
+    <div class="panel">
+      <h2>Or paste what you've got</h2>
+      <div class="field"><label for="cap">A link, the caption, or both</label><textarea id="cap" placeholder="Paste a TikTok, Reel or Short link, the caption, or describe it: &quot;the chef movie on an island that goes VERY wrong&quot;"></textarea>
+        <span class="fine" id="platHint" aria-live="polite">Works with TikTok, Instagram, YouTube, Facebook, Snapchat, X and Threads.</span><input type="hidden" id="link"></div>
+      <div class="needmore" id="needMore" hidden><p id="needTxt"></p><div class="twobtn"><label class="btn upload" for="shot">Add a screenshot</label><button class="btn ghost" type="button" id="typeCap">Type what it's about</button></div></div>
+      <button class="btn primary wide" id="analyzeBtn"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>Find the title</button>
+    </div>
+    <div class="label">Or try a sample caption (matched live by AI)</div>
+    <div class="list" id="demoVids"></div>
+    <div class="panel">
+      <h2>Bring in your streaming lists</h2>
+      <p>Streaming apps don't let other apps sign in and read your lists, so Q'd never asks for your passwords. Pick where your list lives and we'll show you the way in.</p>
+      <div class="seg" id="impTabs" role="group" aria-label="Where your list lives">
+        <button type="button" data-imp="netflix" aria-pressed="true">Netflix</button><button type="button" data-imp="letterboxd">Letterboxd</button><button type="button" data-imp="any">Any other app</button>
+      </div>
+      <div class="imp" id="imp-netflix">
+        <ol class="howto"><li>On a computer, go to netflix.com and open Account.</li><li>Pick your profile, then Viewing activity.</li><li>Scroll to the bottom and click Download all.</li><li>Upload the NetflixViewingHistory.csv file here.</li></ol>
+        <label class="btn upload wide" for="nfx"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>Upload NetflixViewingHistory.csv</label>
+        <input class="sr" type="file" id="nfx" accept=".csv,text/csv">
+        <p class="fine">This is what you've watched, so titles come in marked as watched. Netflix doesn't let anyone export My List.</p>
+      </div>
+      <div class="imp" id="imp-letterboxd" hidden>
+        <ol class="howto"><li>In Letterboxd, open Settings, then Data, and click Export your data.</li><li>Unzip the download.</li><li>Upload the watchlist.csv file here. We'll sort it and roast it.</li></ol>
+        <label class="btn upload wide" for="lbx"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>Upload watchlist.csv</label>
+        <input class="sr" type="file" id="lbx" accept=".csv,text/csv">
+      </div>
+      <div class="imp" id="imp-any" hidden>
+        <p>Prime Video, Disney+, Max, Hulu, Apple TV+ and Peacock don't export watchlists. Open your watchlist in the app and type or paste the titles here, one per line.</p>
+        <div class="field"><label for="pasteList">Your titles</label><textarea id="pasteList" placeholder="Shogun&#10;Dune: Part Two (2024)&#10;Slow Horses"></textarea></div>
+        <button class="btn upload wide" id="pasteBtn" type="button"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>Import these titles</button>
+      </div>
+    </div>
+    <div class="panel" id="scanPanel" hidden>
+      <img class="shotprev" id="shotPrev" alt="Your screenshot" hidden>
+      <div class="scan"><i id="scanBar"></i></div>
+      <ul class="steps" id="steps"></ul>
+      <div id="result" class="list"></div>
+    </div>
+  </section>
+
+  <!-- COURT -->
+  <section class="view" id="v-court" hidden>
+    <div class="slug">INT. COURTROOM – NIGHT</div>
+    <div class="panel" id="courtPanel">
+      <h2>Decision Court</h2>
+      <p>Two people, one couch, zero agreement. Each of you submits a title. Judge Flix decides out loud. The loser serves a sentence.</p>
+      <div class="invite">
+        <button class="subpoena" id="inviteBtn" type="button"><span class="stamp">SUBPOENA</span><span class="tag">Invite the other side</span><b id="inviteLabel">Invite the defendant</b><span class="sub">Send a link. They enter their name, pick and opening statement on their own phone.</span></button>
+        <div id="inviteBox" class="field" hidden>
+          <div class="linkrow" id="linkRow"><input id="inviteLink" readonly aria-label="Invite link"><button class="btn primary" id="shareInvite" type="button" aria-expanded="false" aria-controls="shareRow"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 9l5-5 5 5"/><path d="M5 14v5h14v-5"/></svg>Share</button></div>
+          <div class="sharerow" id="shareRow" hidden>
+            <a class="shareopt" id="shWhatsApp" target="_blank" rel="noopener"><span class="dot" style="background:#25D366">W</span>WhatsApp</a>
+            <a class="shareopt" id="shSms"><span class="dot" style="background:#34C759">M</span>Messages</a>
+            <a class="shareopt" id="shTelegram" target="_blank" rel="noopener"><span class="dot" style="background:#2AABEE">T</span>Telegram</a>
+            <a class="shareopt" id="shEmail"><span class="dot" style="background:#8A7762">@</span>Email</a>
+            <button class="shareopt" id="copyInvite" type="button"><span class="dot" style="background:var(--surface2)">C</span>Copy link</button>
+          </div>
+          <p class="fine" id="inviteStatus" role="status"></p>
+        </div>
+      </div>
+      <div class="vs">
+        <div class="field"><label for="pA">Plaintiff</label><input id="pA" value="Me"></div>
+        <div class="x">vs</div>
+        <div class="field"><label for="pB">Defendant</label><input id="pB" value="My date"></div>
+      </div>
+      <h3 class="fighth">Pick your fighters</h3>
+      <div class="field"><label class="sr" for="courtFind">Find a title</label><input id="courtFind" type="search" placeholder="Find a title for either side"></div>
+      <div class="fightrow"><div class="label" id="fAL"><span id="fAName">Me</span> picks <b id="fAPick"></b></div><div class="rail fight" id="fightA" role="group" aria-labelledby="fAL"></div>
+        <select id="tA" aria-label="Plaintiff's pick" class="sr" tabindex="-1" aria-hidden="true"></select></div>
+      <div class="fightrow"><div class="label" id="fBL"><span id="fBName">My date</span> picks <b id="fBPick"></b></div><div class="rail fight" id="fightB" role="group" aria-labelledby="fBL"></div>
+        <select id="tB" aria-label="Defendant's pick" class="sr" tabindex="-1" aria-hidden="true"></select></div>
+      <details class="args"><summary>Add opening arguments (optional)</summary>
+      <div class="field"><label for="argA">Plaintiff's opening statement</label><textarea id="argA" maxlength="400" placeholder="e.g. I've been saving this for 3 months."></textarea></div>
+      <div class="field"><label for="argB">Defendant's opening statement</label><textarea id="argB" maxlength="400" placeholder="e.g. I cried at the last horror movie. I refuse."></textarea></div>
+      </details>
+      <button class="btn primary wide" id="trialBtn"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4l6 6-3 3-6-6zM11 7l-7 7 3 3 7-7M3 21h10"/></svg>All rise. Begin the trial</button>
+    </div>
+    <div class="verdict" id="verdict" hidden></div>
+    <div class="panel hero-panel" id="summons" hidden>
+      <h2>You've been summoned</h2>
+      <p id="summonsWho" role="status">Connecting to the courtroom…</p>
+      <div class="field"><label for="dName">Your name</label><input id="dName" maxlength="40" autocomplete="given-name"></div>
+      <div class="field"><label for="dPick">Your pick</label><select id="dPick"></select></div>
+      <div class="field"><label for="dArg">Your opening statement (optional)</label><textarea id="dArg" maxlength="400" placeholder="Convince Judge Flix."></textarea></div>
+      <button class="btn primary wide" id="dSubmit" disabled><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"/></svg><span id="dSubmitTxt">Submit to the court</span></button>
+      <p class="fine" id="dStatus">Keep this page open. Judge Flix rules on the other person's screen, and the verdict shows up here.</p>
+    </div>
+    <div class="verdict" id="dVerdict" hidden></div>
+    <button class="btn ticket wide" id="waitBtn"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="4"/><path d="M8 10v4M6 12h4M15 11h.01M17 13h.01"/></svg>Waiting for someone to pick? Play a game</button>
+  </section>
+
+  <!-- GAME -->
+  <section class="view" id="v-game" hidden>
+    <button class="back" id="gameBack" type="button">‹ Back to Court</button>
+    <div class="slug">INT. CONCESSION STAND – LATER</div>
+    <div class="panel">
+      <h2 id="gameTitle">Popcorn Panic</h2>
+      <p id="gameSub">Catch the popcorn, dodge the burnt kernels. 20 seconds.</p>
+      <div class="scoreline"><span id="gScore">Score 0</span><span id="gTime">20s</span></div>
+      <canvas id="cv" width="400" height="420" aria-label="Popcorn catching game. Move your finger or mouse to move the bucket."></canvas>
+      <button class="btn primary wide" id="gStart"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg><span id="gStartTxt">Start</span></button>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs" aria-label="Main"><div class="in">
+  <button data-tab="list" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>My list</button>
+  <button data-tab="discover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Discover</button>
+  <button data-tab="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Save</button>
+  <button data-tab="court"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4l6 6-3 3-6-6zM11 7l-7 7 3 3 7-7M3 21h10"/></svg>Court</button>
+</div></nav>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden><div class="app" id="detail"></div></div>
+
+<div class="shame" id="shame" hidden>
+  <div class="alarm"></div>
+  <div class="chatwin" role="dialog" aria-label="Group chat">
+    <div class="chathead"><b>Movie Night</b><span id="chatMembers"></span></div>
+    <div class="thread" id="thread"></div>
+    <div class="chatfoot" id="chatFoot" hidden>
+      <p>Relax. Nothing was actually sent. This time.</p>
+      <button class="btn wide" id="shameClose">I'll watch something. I promise.</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const GENRES=["Horror","Comedy","Sci-Fi","Romance","Drama","Thriller","Action","Crime"];
+const GCOL={Horror:"#E5484D",Comedy:"#F5B83D","Sci-Fi":"#3FC7E0",Romance:"#F27BA8",Drama:"#A78BFA",Thriller:"#F28A3D",Action:"#F2C94C",Crime:"#8FB8DE"};
+const GRAD={Horror:["#5A0F14","#E5484D"],Comedy:["#7A4B00","#F5B83D"],"Sci-Fi":["#0B3D4A","#3FC7E0"],Romance:["#5C1030","#F27BA8"],Drama:["#2B1A5E","#A78BFA"],Thriller:["#5A2A05","#F28A3D"],Action:["#5A4400","#F2C94C"],Crime:["#0E2A44","#8FB8DE"]};
+const LEVELS=["Polite","Sassy","Savage","Unhinged"];
+const LEVEL_RULES=["gentle and encouraging, like a kind friend","playful and a little sarcastic","savage and brutally specific, but never cruel about the person themselves","completely unhinged and dramatic, chaotic energy, ALL-CAPS moments allowed, but still clean enough for a stage (no swearing, nothing about bodies, identity or trauma)"];
+
+let items=[
+ {id:1,sample:true,title:"Hereditary",year:2018,type:"Movie",genres:["Horror","Drama"],runtime:127,where:["Max","Prime Video"],handle:"@scaredofeverything",caption:"do NOT watch this before a family reunion",want:5,notes:"Everyone says the ending is unhinged",watched:false,after:0,afterNotes:"",saved:"3 days ago"},
+ {id:2,sample:true,title:"The Menu",year:2022,type:"Movie",genres:["Thriller","Comedy"],runtime:107,where:["Max","Hulu"],handle:"@dinnerandamovie",caption:"rich people get served at an island restaurant… and not the good way",want:4,notes:"",watched:true,after:5,afterNotes:"The cheeseburger scene. Perfect.",saved:"2 weeks ago"},
+ {id:3,sample:true,title:"Palm Springs",year:2020,type:"Movie",genres:["Comedy","Romance"],runtime:90,where:["Hulu"],handle:"@lowkeyromcom",platform:"YouTube Shorts",caption:"time loop romcom that's actually funny",want:3,notes:"Date night option",watched:false,after:0,afterNotes:"",saved:"1 week ago"},
+ {id:4,sample:true,title:"Arrival",year:2016,type:"Movie",genres:["Sci-Fi","Drama"],runtime:116,where:["Paramount+","Prime Video"],handle:"@scifisunday",caption:"the alien movie that made me cry about linguistics",want:4,notes:"",watched:false,after:0,afterNotes:"",saved:"5 days ago"},
+ {id:5,sample:true,title:"Severance",year:2022,type:"TV",genres:["Sci-Fi","Thriller"],runtime:null,seasons:2,where:["Apple TV+"],handle:"@officehorrors",platform:"Instagram Reels",caption:"work life balance but make it terrifying",want:5,notes:"Friend won't stop talking about it",watched:false,after:0,afterNotes:"",saved:"yesterday"},
+ {id:6,sample:true,title:"Past Lives",year:2023,type:"Movie",genres:["Romance","Drama"],runtime:106,where:["Paramount+"],handle:"@criesinA24",caption:"quietest movie that destroyed me the loudest",want:2,notes:"",watched:false,after:0,afterNotes:"",saved:"4 weeks ago"},
+ {id:7,sample:true,title:"The Bear",year:2022,type:"TV",genres:["Comedy","Drama"],runtime:null,seasons:4,where:["Hulu","Disney+"],handle:"@yeschef",caption:"stressful in the best way, eat before watching",want:3,notes:"",watched:false,after:0,afterNotes:"",saved:"2 days ago"},
+ {id:8,sample:true,title:"Get Out",year:2017,type:"Movie",genres:["Horror","Thriller"],runtime:104,where:["Peacock"],handle:"@scaredofeverything",caption:"rewatch this and catch every clue",want:4,notes:"",watched:false,after:0,afterNotes:"",saved:"6 days ago"},
+];
+let nextId=100, level=2, voiceOn=false, shamedOnce=false, loserName="";
+/* The list is kept on this device (browser storage), so saves survive a reload. */
+const STORE="qd.list.v1"; let prefs={sampleHidden:false,autoShame:false};
+function ago(t){ const m=Math.round((Date.now()-t)/60000); if(m<1)return "just now"; if(m<60)return `${m} minute${m>1?"s":""} ago`;
+  const hr=Math.round(m/60); if(hr<24)return `${hr} hour${hr>1?"s":""} ago`; const d=Math.round(hr/24); if(d===1)return "yesterday"; if(d<7)return `${d} days ago`;
+  const w=Math.round(d/7); return w<5?`${w} week${w>1?"s":""} ago`:`${Math.round(d/30)} month${d>=45?"s":""} ago`; }
+function persist(){ items.forEach(i=>{ if(i.saved==="just now"&&!i.at) i.at=Date.now(); });
+  try{ localStorage.setItem(STORE,JSON.stringify({v:1,items,nextId,prefs})); }catch(e){} }
+try{ const d=JSON.parse(localStorage.getItem(STORE)||"null");
+  if(d&&Array.isArray(d.items)){ items=d.items.filter(i=>i&&i.title&&Array.isArray(i.genres)&&Array.isArray(i.where));
+    items.forEach(i=>{ if(i.at) i.saved=ago(i.at); }); nextId=Math.max(+d.nextId||100,...items.map(i=>(+i.id||0)+1)); prefs={...prefs,...(d.prefs||{})}; } }catch(e){}
+try{ voiceOn=localStorage.getItem("qd.voiceOn")==="1"; }catch(e){}
+const demoVids=[
+ {handle:"@gothgirlcinema",caption:"gothic vampire movie with Lily-Rose Depp, watch it with the lights OFF",link:"https://www.tiktok.com/@gothgirlcinema/video/demo1",
+  evidence:["caption: \"gothic vampire movie\"","caption names Lily-Rose Depp","two films share this title"],
+  cands:[{title:"Nosferatu",year:2024,type:"Movie",genres:["Horror","Drama"],runtime:132,where:["Peacock"],confidence:.62,why:"Lily-Rose Depp stars in the 2024 remake"},
+         {title:"Nosferatu",year:1922,type:"Movie",genres:["Horror"],runtime:94,where:["Tubi","Prime Video"],confidence:.31,why:"Same title, the silent original"}]},
+ {handle:"@comfortwatches",caption:"comfort show for when you're sad. Michael Scott forever.",link:"https://www.instagram.com/reel/demo2/",platform:"Instagram Reels",
+  evidence:["caption: \"Michael Scott\"","\"comfort show\" means TV","US version, not UK"],
+  cands:[{title:"The Office",year:2005,type:"TV",genres:["Comedy"],runtime:null,seasons:9,where:["Peacock"],confidence:.97,why:"Michael Scott is from the US version"}]},
+ {handle:"@spacecinema",caption:"the docking scene with the organ music. no time for caution. I still have chills",link:"https://www.youtube.com/shorts/demo3",platform:"YouTube Shorts",
+  evidence:["caption quotes \"no time for caution\"","\"docking scene\" + organ score","space movie"],
+  cands:[{title:"Interstellar",year:2014,type:"Movie",genres:["Sci-Fi","Drama"],runtime:169,where:["Paramount+"],confidence:.96,why:"\"No time for caution\" is Cooper's docking line"}]},
+];
+
+const LENS=["All","Under 1h45","1h45–2h","Over 2h","Series"];
+let fGenre=GENRES.includes(prefs.fGenre)?prefs.fGenre:"All", fLen=LENS.includes(prefs.fLen)?prefs.fLen:"All", fStatus=["todo","watched","all"].includes(prefs.fStatus)?prefs.fStatus:"todo", sortBy=prefs.sortBy||"recent", query="";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- Claude via the artifact's sample capability ---------- */
+let sampleP=null;
+function getSample(){ if(!sampleP){ sampleP=(window.claude&&window.claude.use)?window.claude.use("sample").catch(()=>null):Promise.resolve(null);} return sampleP; }
+async function askJSON(prompt,opts={}){
+  try{ const s=await getSample(); if(!s) return {err:"unavailable"}; return {data:await s.json(prompt,{modelTier:"quick",cache:false,...opts})}; }
+  catch(e){ return {err:(e&&e.code)||"error"}; }
+}
+getSample().then(s=>s&&s.limits?s.limits():null).then(l=>{ if(!l||!l.images){ $("#visionNote").hidden=false; } }).catch(()=>{$("#visionNote").hidden=false;});
+
+/* ---------- voice + sound ---------- */
+let actx=null;
+function audio(){ try{ if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); }catch(e){} return actx; }
+function knock(t){ const a=actx; const o=a.createOscillator(), g=a.createGain(); o.type="triangle"; o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(60,t+.12);
+  g.gain.setValueAtTime(.9,t); g.gain.exponentialRampToValueAtTime(.001,t+.18); o.connect(g).connect(a.destination); o.start(t); o.stop(t+.2);
+  const n=a.createBufferSource(), b=a.createBuffer(1,a.sampleRate*.05,a.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+  const ng=a.createGain(); ng.gain.value=.5; n.buffer=b; n.connect(ng).connect(a.destination); n.start(t); }
+function gavel(){ if(!voiceOn)return; const a=audio(); if(!a)return; const t=a.currentTime+.02; knock(t); knock(t+.22); knock(t+.44); }
+function ping(){ if(!voiceOn)return; const a=audio(); if(!a)return; const t=a.currentTime+.01; [880,1320].forEach((f,k)=>{const o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,t+k*.12);g.gain.exponentialRampToValueAtTime(.35,t+k*.12+.02);g.gain.exponentialRampToValueAtTime(.0001,t+k*.12+.25);o.connect(g).connect(a.destination);o.start(t+k*.12);o.stop(t+k*.12+.3);}); }
+let voiceName=""; try{ voiceName=localStorage.getItem("queued.voice")||""; }catch(e){}
+function pickVoice(){ const vs=(window.speechSynthesis&&speechSynthesis.getVoices())||[]; const en=vs.filter(v=>/^en/i.test(v.lang));
+  const chosen=voiceName&&vs.find(v=>v.name===voiceName); if(chosen) return chosen;
+  return en.find(v=>/Daniel|Fred|Google UK English Male|Arthur|Rishi|Aaron/i.test(v.name))||en[0]||null; }
+function speak(text,{pitch=1,rate=1}={}){ if(!voiceOn||!window.speechSynthesis)return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); const v=pickVoice(); if(v)u.voice=v; u.pitch=pitch; u.rate=rate; speechSynthesis.speak(u);}catch(e){} }
+function fillVoices(){ const sel=$("#voicePick"); if(!sel||!window.speechSynthesis)return; const en=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+  sel.innerHTML=`<option value="">Automatic (deep judge voice)</option>`+en.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("");
+  sel.value=en.some(v=>v.name===voiceName)?voiceName:""; }
+if(window.speechSynthesis){ speechSynthesis.onvoiceschanged=fillVoices; fillVoices(); }
+$("#voicePick").onchange=e=>{ voiceName=e.target.value; try{ localStorage.setItem("queued.voice",voiceName); }catch(err){} audio(); speak("Order in the court. This is my new voice.",{pitch:.8,rate:.97}); };
+$("#voiceTest").onclick=()=>{ if(!window.speechSynthesis){ toast("This browser can't speak out loud.","No voices"); return; } if(!voiceOn) $("#voiceBtn").click(); speak("Order in the court. This is my new voice.",{pitch:.8,rate:.97}); };
+function showVoice(){ $("#voiceBtn").setAttribute("aria-pressed",voiceOn); $("#voiceBtn").setAttribute("aria-label",voiceOn?"Voice on":"Voice off"); $("#wave").style.display=voiceOn?"":"none"; }
+showVoice();
+$("#voiceBtn").onclick=()=>{ voiceOn=!voiceOn; try{ localStorage.setItem("qd.voiceOn",voiceOn?"1":"0"); }catch(e){} $("#voiceBtn").setAttribute("aria-pressed",voiceOn); $("#voiceBtn").setAttribute("aria-label",voiceOn?"Voice on":"Voice off"); $("#wave").style.display=voiceOn?"":"none"; if(!voiceOn&&window.speechSynthesis)speechSynthesis.cancel(); else { audio(); speak("Voice on.",{rate:1.1}); } };
+
+/* ---------- helpers ---------- */
+function favGenre(){ const c={}; items.forEach(i=>i.genres.forEach(g=>c[g]=(c[g]||0)+1)); return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0]||"Comedy"; }
+function setTheme(g){ document.body.dataset.genre=g; }
+function lenLabel(i){ return i.type==="TV"?`TV · ${i.seasons||1} season${(i.seasons||1)>1?"s":""}`:i.runtime?`${Math.floor(i.runtime/60)}h ${i.runtime%60}m`:"Movie"; }
+/* Film library from OMDb: details were fetched once. Posters are separate files next to the page (p/ full size, t/ 128 px thumbnails),
+   loaded only when they scroll into view, so the page never calls OMDb and holds no API key. */
+const FILMS=[
+{"imdb": "tt7784604", "t": "Hereditary", "y": 2018, "r": "7.3", "d": "Ari Aster", "m": 127},
+{"imdb": "tt9764362", "t": "The Menu", "y": 2022, "r": "7.2", "d": "Mark Mylod", "m": 107},
+{"imdb": "tt9484998", "t": "Palm Springs", "y": 2020, "r": "7.4", "d": "Max Barbakow", "m": 90},
+{"imdb": "tt2543164", "t": "Arrival", "y": 2016, "r": "7.9", "d": "Denis Villeneuve", "m": 116},
+{"imdb": "tt11280740", "t": "Severance", "y": 2022, "r": "8.6"},
+{"imdb": "tt13238346", "t": "Past Lives", "y": 2023, "r": "7.8", "d": "Celine Song", "m": 105},
+{"imdb": "tt14452776", "t": "The Bear", "y": 2022, "r": "8.5"},
+{"imdb": "tt5052448", "t": "Get Out", "y": 2017, "r": "7.8", "d": "Jordan Peele", "m": 104},
+{"imdb": "tt6751668", "t": "Parasite", "y": 2019, "r": "8.5", "d": "Bong Joon Ho", "m": 132},
+{"imdb": "tt6710474", "t": "Everything Everywhere All at Once", "y": 2022, "r": "7.7", "d": "Daniel Kwan, Daniel Scheinert", "m": 139},
+{"imdb": "tt0084787", "t": "The Thing", "y": 1982, "r": "8.2", "d": "John Carpenter", "m": 109},
+{"imdb": "tt0118694", "t": "In the Mood for Love", "y": 2000, "r": "8.0", "d": "Wong Kar-Wai", "m": 98},
+{"imdb": "tt0112471", "t": "Before Sunrise", "y": 1995, "r": "8.1", "d": "Richard Linklater", "m": 101},
+{"imdb": "tt0113277", "t": "Heat", "y": 1995, "r": "8.3", "d": "Michael Mann", "m": 170},
+{"imdb": "tt4468740", "t": "Paddington 2", "y": 2017, "r": "7.8", "d": "Paul King", "m": 103},
+{"imdb": "tt1392190", "t": "Mad Max: Fury Road", "y": 2015, "r": "8.1", "d": "George Miller", "m": 120},
+{"imdb": "tt8613070", "t": "Portrait of a Lady on Fire", "y": 2019, "r": "8.0", "d": "Céline Sciamma", "m": 122},
+{"imdb": "tt0364569", "t": "Oldboy", "y": 2003, "r": "8.3", "d": "Park Chan-wook", "m": 120},
+{"imdb": "tt2278388", "t": "The Grand Budapest Hotel", "y": 2014, "r": "8.1", "d": "Wes Anderson", "m": 99},
+{"imdb": "tt0078748", "t": "Alien", "y": 1979, "r": "8.5", "d": "Ridley Scott", "m": 117},
+{"imdb": "tt5040012", "t": "Nosferatu", "y": 2024, "r": "7.1", "d": "Robert Eggers", "m": 132},
+{"imdb": "tt0013442", "t": "Nosferatu", "y": 1922, "r": "7.8", "a": "Nosferatu: A Symphony of Horror", "d": "F.W. Murnau", "m": 94},
+{"imdb": "tt0386676", "t": "The Office", "y": 2005, "r": "9.0"},
+{"imdb": "tt0081505", "t": "The Shining", "y": 1980, "r": "8.4", "d": "Stanley Kubrick", "m": 146},
+{"imdb": "tt8772262", "t": "Midsommar", "y": 2019, "r": "7.1", "d": "Ari Aster", "m": 148},
+{"imdb": "tt6644200", "t": "A Quiet Place", "y": 2018, "r": "7.5", "d": "John Krasinski", "m": 90},
+{"imdb": "tt3235888", "t": "It Follows", "y": 2014, "r": "6.8", "d": "David Robert Mitchell", "m": 100},
+{"imdb": "tt2321549", "t": "The Babadook", "y": 2014, "r": "6.8", "d": "Jennifer Kent", "m": 94},
+{"imdb": "tt0829482", "t": "Superbad", "y": 2007, "r": "7.6", "d": "Greg Mottola", "m": 113},
+{"imdb": "tt8946378", "t": "Knives Out", "y": 2019, "r": "7.9", "d": "Rian Johnson", "m": 130},
+{"imdb": "tt1489887", "t": "Booksmart", "y": 2019, "r": "7.1", "d": "Olivia Wilde", "m": 102},
+{"imdb": "tt3416742", "t": "What We Do in the Shadows", "y": 2014, "r": "7.6", "d": "Jemaine Clement, Taika Waititi", "m": 86},
+{"imdb": "tt0816692", "t": "Interstellar", "y": 2014, "r": "8.7", "d": "Christopher Nolan", "m": 169},
+{"imdb": "tt1856101", "t": "Blade Runner 2049", "y": 2017, "r": "8.0", "d": "Denis Villeneuve", "m": 164},
+{"imdb": "tt0470752", "t": "Ex Machina", "y": 2014, "r": "7.7", "d": "Alex Garland", "m": 108},
+{"imdb": "tt15239678", "t": "Dune: Part Two", "y": 2024, "r": "8.4", "d": "Denis Villeneuve", "m": 166},
+{"imdb": "tt0133093", "t": "The Matrix", "y": 1999, "r": "8.7", "d": "Lana Wachowski, Lilly Wachowski", "m": 136},
+{"imdb": "tt3783958", "t": "La La Land", "y": 2016, "r": "8.0", "d": "Damien Chazelle", "m": 128},
+{"imdb": "tt0414387", "t": "Pride & Prejudice", "y": 2005, "r": "7.8", "a": "Pride and Prejudice", "d": "Joe Wright", "m": 129},
+{"imdb": "tt5726616", "t": "Call Me by Your Name", "y": 2017, "r": "7.8", "d": "Luca Guadagnino", "m": 132},
+{"imdb": "tt3104988", "t": "Crazy Rich Asians", "y": 2018, "r": "6.9", "d": "Jon M. Chu", "m": 120},
+{"imdb": "tt2582802", "t": "Whiplash", "y": 2014, "r": "8.5", "d": "Damien Chazelle", "m": 106},
+{"imdb": "tt4975722", "t": "Moonlight", "y": 2016, "r": "7.4", "d": "Barry Jenkins", "m": 111},
+{"imdb": "tt19770238", "t": "Aftersun", "y": 2022, "r": "7.6", "d": "Charlotte Wells", "m": 102},
+{"imdb": "tt0068646", "t": "The Godfather", "y": 1972, "r": "9.2", "d": "Francis Ford Coppola", "m": 175},
+{"imdb": "tt2267998", "t": "Gone Girl", "y": 2014, "r": "8.1", "d": "David Fincher", "m": 149},
+{"imdb": "tt1392214", "t": "Prisoners", "y": 2013, "r": "8.2", "d": "Denis Villeneuve", "m": 153},
+{"imdb": "tt0477348", "t": "No Country for Old Men", "y": 2007, "r": "8.2", "d": "Ethan Coen, Joel Coen", "m": 122},
+{"imdb": "tt0903747", "t": "Breaking Bad", "y": 2008, "r": "9.5"},
+{"imdb": "tt4574334", "t": "Stranger Things", "y": 2016, "r": "8.6"},
+{"imdb": "tt5687612", "t": "Fleabag", "y": 2016, "r": "8.7"},
+{"imdb": "tt7660850", "t": "Succession", "y": 2018, "r": "8.8"},
+{"imdb": "tt2788316", "t": "Shogun", "y": 2024, "r": "8.6", "a": "Shōgun"},
+{"imdb": "tt5875444", "t": "Slow Horses", "y": 2022, "r": "8.3"},
+{"imdb": "tt1478964", "g": ["Action", "Comedy"], "t": "Attack the Block", "y": 2011, "r": "6.7", "d": "Joe Cornish", "m": 88},
+{"imdb": "tt0116282", "g": ["Crime", "Drama"], "t": "Fargo", "y": 1996, "r": "8.1", "d": "Joel Coen, Ethan Coen", "m": 98},
+{"imdb": "tt2802850", "g": ["Crime", "Drama"], "tv": 1, "s": 5, "t": "Fargo", "y": 2014, "r": "8.8"},
+{"imdb": "tt6857112", "g": ["Horror", "Thriller"], "t": "Us", "y": 2019, "r": "6.8", "d": "Jordan Peele", "m": 116},
+{"imdb": "tt10954984", "g": ["Horror", "Thriller"], "t": "Nope", "y": 2022, "r": "6.8", "d": "Jordan Peele", "m": 130},
+{"imdb": "tt10638522", "g": ["Horror", "Thriller"], "t": "Talk to Me", "y": 2022, "r": "7.1", "d": "Danny Philippou, Michael Philippou", "m": 95},
+{"imdb": "tt0117571", "g": ["Horror", "Thriller"], "t": "Scream", "y": 1996, "r": "7.4", "d": "Wes Craven", "m": 111},
+{"imdb": "tt1457767", "g": ["Horror", "Thriller"], "t": "The Conjuring", "y": 2013, "r": "7.5", "d": "James Wan", "m": 112},
+{"imdb": "tt0289043", "g": ["Drama", "Horror"], "t": "28 Days Later", "y": 2002, "r": "7.5", "d": "Danny Boyle", "m": 113},
+{"imdb": "tt5700672", "g": ["Action", "Horror"], "t": "Train to Busan", "y": 2016, "r": "7.6", "d": "Yeon Sang-ho", "m": 118},
+{"imdb": "tt0365748", "g": ["Comedy", "Horror"], "t": "Shaun of the Dead", "y": 2004, "r": "7.8", "d": "Edgar Wright", "m": 99},
+{"imdb": "tt0425112", "g": ["Action", "Comedy"], "t": "Hot Fuzz", "y": 2007, "r": "7.8", "d": "Edgar Wright", "m": 121},
+{"imdb": "tt3799694", "g": ["Action", "Comedy"], "t": "The Nice Guys", "y": 2016, "r": "7.4", "d": "Shane Black", "m": 116},
+{"imdb": "tt1478338", "g": ["Comedy"], "t": "Bridesmaids", "y": 2011, "r": "6.8", "d": "Paul Feig", "m": 125},
+{"imdb": "tt2704998", "g": ["Action", "Comedy"], "t": "Game Night", "y": 2018, "r": "6.9", "d": "John Francis Daley, Jonathan Goldstein", "m": 100},
+{"imdb": "tt1517268", "g": ["Action", "Comedy"], "t": "Barbie", "y": 2023, "r": "6.8", "d": "Greta Gerwig", "m": 114},
+{"imdb": "tt10986410", "g": ["Comedy", "Drama"], "tv": 1, "s": 4, "t": "Ted Lasso", "y": 2020, "r": "8.7"},
+{"imdb": "tt14218830", "g": ["Comedy"], "tv": 1, "s": 5, "t": "Abbott Elementary", "y": 2021, "r": "8.2"},
+{"imdb": "tt3526078", "g": ["Comedy"], "tv": 1, "s": 6, "t": "Schitt's Creek", "y": 2015, "r": "8.5"},
+{"imdb": "tt2798920", "g": ["Action", "Drama"], "t": "Annihilation", "y": 2018, "r": "6.8", "d": "Alex Garland", "m": 115},
+{"imdb": "tt0206634", "g": ["Drama", "Sci-Fi"], "t": "Children of Men", "y": 2006, "r": "7.9", "d": "Alfonso Cuarón", "m": 109},
+{"imdb": "tt1375666", "g": ["Action", "Sci-Fi"], "t": "Inception", "y": 2010, "r": "8.8", "d": "Christopher Nolan", "m": 148},
+{"imdb": "tt1631867", "g": ["Action", "Sci-Fi"], "t": "Edge of Tomorrow", "y": 2014, "r": "7.9", "d": "Doug Liman", "m": 113},
+{"imdb": "tt2085059", "g": ["Crime", "Drama"], "tv": 1, "s": 7, "t": "Black Mirror", "y": 2011, "r": "8.7"},
+{"imdb": "tt3581920", "g": ["Action", "Drama"], "tv": 1, "s": 3, "t": "The Last of Us", "y": 2023, "r": "8.4"},
+{"imdb": "tt9253284", "g": ["Action", "Drama"], "tv": 1, "s": 2, "t": "Andor", "y": 2022, "r": "8.6"},
+{"imdb": "tt0381681", "g": ["Drama", "Romance"], "t": "Before Sunset", "y": 2004, "r": "8.1", "d": "Richard Linklater", "m": 80},
+{"imdb": "tt2194499", "g": ["Comedy", "Drama"], "t": "About Time", "y": 2013, "r": "7.8", "d": "Richard Curtis", "m": 123},
+{"imdb": "tt0098635", "g": ["Comedy", "Drama"], "t": "When Harry Met Sally...", "y": 1989, "r": "7.7", "d": "Rob Reiner", "m": 95},
+{"imdb": "tt9059760", "g": ["Drama", "Romance"], "tv": 1, "s": 1, "t": "Normal People", "y": 2020, "r": "8.4"},
+{"imdb": "tt0125439", "g": ["Comedy", "Drama"], "t": "Notting Hill", "y": 1999, "r": "7.2", "d": "Roger Michell", "m": 124},
+{"imdb": "tt1285016", "g": ["Drama"], "t": "The Social Network", "y": 2010, "r": "7.8", "d": "David Fincher", "m": 120},
+{"imdb": "tt15398776", "g": ["Drama"], "t": "Oppenheimer", "y": 2023, "r": "8.2", "d": "Christopher Nolan", "m": 180},
+{"imdb": "tt4925292", "g": ["Comedy", "Drama"], "t": "Lady Bird", "y": 2017, "r": "7.4", "d": "Greta Gerwig", "m": 94},
+{"imdb": "tt14849194", "g": ["Comedy", "Drama"], "t": "The Holdovers", "y": 2023, "r": "7.9", "d": "Alexander Payne", "m": 133},
+{"imdb": "tt7160372", "g": ["Drama"], "t": "The Zone of Interest", "y": 2023, "r": "7.3", "d": "Jonathan Glazer", "m": 105},
+{"imdb": "tt14230458", "g": ["Comedy", "Drama"], "t": "Poor Things", "y": 2023, "r": "7.7", "d": "Yorgos Lanthimos", "m": 141},
+{"imdb": "tt0443706", "g": ["Crime", "Drama"], "t": "Zodiac", "y": 2007, "r": "7.7", "d": "David Fincher", "m": 157},
+{"imdb": "tt2872718", "g": ["Crime", "Drama"], "t": "Nightcrawler", "y": 2014, "r": "7.8", "d": "Dan Gilroy", "m": 117},
+{"imdb": "tt3397884", "g": ["Action", "Crime"], "t": "Sicario", "y": 2015, "r": "7.7", "d": "Denis Villeneuve", "m": 121},
+{"imdb": "tt5727208", "g": ["Crime", "Drama"], "t": "Uncut Gems", "y": 2019, "r": "7.4", "d": "Benny Safdie, Josh Safdie", "m": 135},
+{"imdb": "tt2356777", "g": ["Crime", "Drama"], "tv": 1, "s": 5, "t": "True Detective", "y": 2014, "r": "8.8"},
+{"imdb": "tt5290382", "g": ["Crime", "Drama"], "tv": 1, "s": 2, "t": "Mindhunter", "y": 2017, "r": "8.6"},
+{"imdb": "tt4158110", "g": ["Crime", "Drama"], "tv": 1, "s": 4, "t": "Mr. Robot", "y": 2015, "r": "8.5"},
+{"imdb": "tt0141842", "g": ["Crime", "Drama"], "tv": 1, "s": 6, "t": "The Sopranos", "y": 1999, "r": "9.2"},
+{"imdb": "tt7366338", "g": ["Drama", "Thriller"], "tv": 1, "s": 1, "t": "Chernobyl", "y": 2019, "r": "9.3"}
+];
+const norm=s=>String(s??"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+function film(i){ const n=norm(i.title), y=parseInt(i.year)||0, same=FILMS.filter(f=>norm(f.t)===n||(f.a&&norm(f.a)===n));
+  return same.find(f=>!y||Math.abs(f.y-y)<=1)||(same.length===1?same[0]:undefined); }
+const posterSrc=(f,big)=>`${big?"p":"t"}/${f.imdb}.jpg`;
+function poster(i,big){ const f=film(i); if(f) return `<div class="poster has-img"${big?` style="background:#111 url(${posterSrc(f)}) center/cover"`:""}><img src="${posterSrc(f,big)}" alt="${esc(i.title)} poster" loading="lazy" decoding="async"></div>`;
+  const [a,b]=GRAD[i.genres[0]]||GRAD.Drama; return `<div class="poster" style="background:linear-gradient(160deg,${b},${a})"><span>${esc(i.title)}</span></div>`; }
+function gtags(i){ return i.genres.map(g=>`<span class="gtag" style="background:${GCOL[g]}22;color:${GCOL[g]}">${g}</span>`).join(""); }
+function unwatched(){ return items.filter(i=>!i.watched).length; }
+function totalHours(){ return Math.round(items.filter(i=>!i.watched).reduce((s,i)=>s+(i.type==="TV"?(i.seasons||1)*8*45:i.runtime),0)/60); }
+function cleanCands(list){ return list.map(c=>{ const g=(c.genres||[]).filter(x=>GENRES.includes(x)).slice(0,2);
+  return {...c,genres:g.length?g:["Drama"],type:c.type==="TV"?"TV":"Movie",runtime:c.type==="TV"?null:(+c.runtime||110),seasons:+c.seasons||1,where:(c.where&&c.where.length?c.where:["Check JustWatch"]).slice(0,3),confidence:Math.max(0,Math.min(1,+c.confidence||.5))}; }); }
+
+/* ---------- list ---------- */
+function renderStat(){ $("#stat").innerHTML=`<b>${items.length}</b> saved · <b>${items.length-unwatched()}</b> watched`; }
+/* Filters are faceted: each chip's count reflects the other active filters, and empty options are hidden. */
+function lenIn(i,l){ if(l==="All")return true; if(l==="Series")return i.type==="TV"; if(i.type==="TV")return false; const m=+i.runtime||0; if(!m)return false;
+  if(l==="Under 1h45")return m<105; if(l==="1h45–2h")return m>=105&&m<=120; return m>120; }
+function lenOk(i){ return lenIn(i,fLen); }
+function statusOk(i,s=fStatus){ return s==="all"||(s==="watched"?!!i.watched:!i.watched); }
+function textOk(i,q){ return !q||[i.title,i.caption,i.notes,i.afterNotes,i.handle,i.genres.join(" ")].join(" ").toLowerCase().includes(q); }
+function filtered(skip){ const q=query.trim().toLowerCase();
+  return items.filter(i=>textOk(i,q)&&(skip==="s"||statusOk(i))&&(skip==="g"||fGenre==="All"||i.genres.includes(fGenre))&&(skip==="l"||lenOk(i))); }
+const mins=i=>i.type==="TV"?(i.seasons||1)*8*45:(+i.runtime||110);
+const SORTS={recent:null,want:(a,b)=>(b.want||0)-(a.want||0),short:(a,b)=>mins(a)-mins(b),rating:(a,b)=>(parseFloat(film(b)?.r)||0)-(parseFloat(film(a)?.r)||0)};
+function renderChips(){
+  const sb=filtered("s"), sc={todo:sb.filter(i=>!i.watched).length,watched:sb.filter(i=>i.watched).length,all:sb.length};
+  $("#statusSeg").innerHTML=[["todo","To watch"],["watched","Watched"],["all","All"]].map(([k,l])=>`<button type="button" data-s="${k}" aria-pressed="${k===fStatus}" aria-label="${l}, ${sc[k]}">${l} <span class="n" aria-hidden="true">${sc[k]}</span></button>`).join("");
+  const gb=filtered("g"), gc={}; gb.forEach(i=>i.genres.forEach(g=>gc[g]=(gc[g]||0)+1));
+  $("#genreChips").innerHTML=[["All",gb.length],...GENRES.filter(g=>gc[g]||g===fGenre).map(g=>[g,gc[g]||0])]
+    .map(([g,n])=>`<button class="chip" type="button" aria-pressed="${g===fGenre}" data-g="${g}" aria-label="${g==="All"?"All genres":g}, ${n} title${n===1?"":"s"}">${g}<span class="n" aria-hidden="true">${n}</span></button>`).join("");
+  const lb=filtered("l");
+  $("#lenChips").innerHTML=LENS.map(l=>[l,lb.filter(i=>lenIn(i,l)).length]).filter(([l,n])=>n||l==="All"||l===fLen)
+    .map(([l,n])=>`<button class="chip" type="button" aria-pressed="${l===fLen}" data-l="${l}" aria-label="${l==="All"?"Any length":l}, ${n} title${n===1?"":"s"}">${l}<span class="n" aria-hidden="true">${n}</span></button>`).join("");
+  $("#sortBy").value=sortBy;
+}
+function clearFilters(){ fGenre="All"; fLen="All"; query=""; $("#q").value=""; fStatus="todo"; if(!filtered().length) fStatus="all"; setTheme(""); renderList(); }
+function renderList(){
+  const q=query.trim().toLowerCase(); renderChips();
+  const rows=filtered(); if(SORTS[sortBy]) rows.sort(SORTS[sortBy]);
+  const active=[fStatus==="watched"?"Watched":fStatus==="all"?"":"",fGenre!=="All"?fGenre:"",fLen!=="All"?fLen:"",q?`"${query.trim()}"`:""].filter(Boolean);
+  const nf=(fGenre!=="All")+(fLen!=="All")+(fStatus!=="todo")+(sortBy!=="recent"); $("#fCount").hidden=!nf; $("#fCount").textContent=nf;
+  $("#filterBtn").setAttribute("aria-label",nf?`Filter, ${nf} active`:"Filter");
+  const statusTxt=fStatus==="todo"?"to watch":fStatus==="watched"?"watched":"saves";
+  $("#filterSum").innerHTML=`<b>${rows.length}</b> ${statusTxt}${[fGenre!=="All"?fGenre:"",fLen!=="All"?fLen:""].filter(Boolean).map(x=>` · ${esc(x)}`).join("")} · ${items.length-unwatched()} of ${items.length} watched${fGenre!=="All"||fLen!=="All"||q||fStatus!=="todo"?` · <button class="linkbtn" type="button" id="clearF">Clear</button>`:""}`;
+  const cf=$("#clearF"); if(cf) cf.onclick=clearFilters;
+  prefs.fGenre=fGenre; prefs.fLen=fLen; prefs.fStatus=fStatus; prefs.sortBy=sortBy;
+  $("#list").innerHTML=rows.length?rows.map(i=>`<button class="card" data-id="${i.id}" aria-label="${esc(i.title)}, ${esc(i.year)}, ${esc(i.type==="TV"?"TV series":lenLabel(i))}, ${esc(i.genres.join(" and "))}${film(i)?`, IMDb ${film(i).r}`:""}, ${i.watched?"watched":`want ${i.want} of 5`}">${poster(i)}<div><h3>${esc(i.title)}</h3><div class="meta">${i.year} · ${lenLabel(i)}${film(i)?` · IMDb ${film(i).r}`:""}${i.sample?" · Sample":""}</div>${gtags(i)}</div><div class="want">${i.watched?'<span class="watched-badge">Watched</span>':`<b>${i.want}/5</b>want`}</div></button>`).join("")
+   :!items.length?`<div class="empty"><b>Your list is empty.</b>Save a rec from a TikTok, Reel or Short, or find something in Discover.<div class="twobtn"><button class="btn primary" type="button" data-go="add">Save a rec</button><button class="btn search" type="button" data-go="discover">Discover</button></div></div>`
+   :`<div class="empty"><b>${fStatus==="watched"&&!items.some(i=>i.watched)?"Nothing watched yet.":fStatus==="todo"&&items.every(i=>i.watched)?"You've watched everything. Legend.":"Nothing matches."}</b>No saves fit ${esc(active.join(" + ")||"these filters")}.<div style="margin-top:12px"><button class="btn ghost" type="button" data-clear="1">Clear filters</button></div></div>`;
+  $("#sampleBar").hidden=prefs.sampleHidden||!items.some(i=>i.sample);
+  if(!lastRoast) $("#roastLine").textContent=tonightLine();
+  $("#filters").hidden=!items.length;
+  renderStat(); renderShelf(); persist();
+}
+let lastSelOpts="";
+/* poster rails that drive the (visually hidden) selects, so the invite code keeps working unchanged */
+function fighterOf(v){ if(v.startsWith("f:")){ const s=[...SHELF,...EXTRA].find(x=>x.imdb===v.slice(2)), f=s&&shelfFilm(s); return f?{title:f.t,year:f.y,genres:s.genres}:null; } return items.find(i=>String(i.id)===v)||null; }
+function renderFighters(){ [["A","#tA","#fightA"],["B","#tB","#fightB"]].forEach(([k,sel,rail])=>{ const s=$(sel), val=s.value, dis=s.disabled;
+    $(rail).innerHTML=[...s.options].map(o=>{ const t=fighterOf(o.value); if(!t) return ""; const on=o.value===val;
+      return `<button class="fighter" type="button" data-v="${esc(o.value)}" aria-pressed="${on}" ${dis&&!on?"disabled":""} aria-label="${esc(t.title)}${o.parentElement.label==="My list"?", on your list":""}">${poster(t)}<span>${esc(t.title)}</span></button>`; }).join("");
+    $("#f"+k+"Pick").textContent=s.selectedOptions[0]?s.selectedOptions[0].textContent:"";
+    const on=$(rail).querySelector('[aria-pressed="true"]'); if(on) on.scrollIntoView({block:"nearest",inline:"nearest"}); });
+  $("#fAName").textContent=$("#pA").value.trim()||"Plaintiff"; $("#fBName").textContent=$("#pB").value.trim()||"Defendant"; }
+["A","B"].forEach(k=>$("#fight"+k).addEventListener("click",e=>{ const b=e.target.closest(".fighter"); if(!b||b.disabled)return; const s=$("#t"+k); s.value=b.dataset.v; s.dispatchEvent(new Event("change")); renderFighters(); }));
+["#pA","#pB"].forEach(k=>$(k).addEventListener("input",renderFighters));
+function renderSelects(){ const cq=norm($("#courtFind").value), keep=[$("#tA").value,$("#tB").value], hit=(v,t)=>!cq||norm(t).includes(cq)||keep.includes(v);
+  const mine=items.filter(i=>!i.watched&&hit(String(i.id),i.title)), others=[...SHELF,...EXTRA].filter(s=>!items.some(i=>film(i)===shelfFilm(s))&&hit("f:"+s.imdb,shelfFilm(s).t));
+  const o=`<optgroup label="My list">${mine.map(i=>`<option value="${i.id}">${esc(i.title)}</option>`).join("")}</optgroup>`
+   +(others.length?`<optgroup label="More from OMDb">${others.map(s=>{const f=shelfFilm(s); return `<option value="f:${s.imdb}">${esc(f.t)} (${f.y})</option>`;}).join("")}</optgroup>`:"");
+  const keepA=$("#tA").value; lastSelOpts=o; $("#tA").innerHTML=o; if(keepA&&[...$("#tA").options].some(x=>x.value===keepA))$("#tA").value=keepA; const keepB=$("#tB").value; $("#tB").innerHTML=o; if(keepB&&[...$("#tB").options].some(x=>x.value===keepB))$("#tB").value=keepB; else if($("#tB").options.length>1)$("#tB").selectedIndex=1;  applyRemoteB(); sharePlaintiff(); renderFighters(); }
+
+function go(tab){ document.querySelectorAll(".view").forEach(v=>v.hidden=v.id!=="v-"+tab);
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.removeAttribute("aria-current"));
+  const nb=document.querySelector(`nav.tabs button[data-tab="${tab==="game"?"court":tab}"]`); if(nb)nb.setAttribute("aria-current","page");
+  if(tab==="discover"){ renderShelf(); } if(tab==="court")renderSelects(); if(tab==="game")prepGame(); if(tab==="list"){setTheme(fGenre==="All"?"":fGenre);renderList();}
+  window.scrollTo(0,0); }
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+
+let toastT;
+function toast(msg,head="Q'd says",ms=4200){ const t=$("#toast"); t.classList.remove("act"); t.innerHTML=`<div><b>${esc(head)}</b>${esc(msg)}</div>`; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),ms); }
+
+function toastUndo(msg,head,undo,ms=6000){ const t=$("#toast"); t.innerHTML=`<div><b>${esc(head)}</b>${esc(msg)}</div><button class="undo" type="button">Undo</button>`;
+  t.classList.add("show","act"); clearTimeout(toastT);
+  t.querySelector(".undo").onclick=()=>{ undo(); toast("Undone.","Back how it was",1800); };
+  toastT=setTimeout(()=>t.classList.remove("show","act"),ms); }
+$("#q").oninput=e=>{query=e.target.value;renderList();};
+$("#genreChips").onclick=e=>{const b=e.target.closest("[data-g]");if(!b)return;const g=b.dataset.g;fGenre=g===fGenre&&g!=="All"?"All":g;setTheme(fGenre==="All"?"":fGenre);renderList();};
+$("#lenChips").onclick=e=>{const b=e.target.closest("[data-l]");if(!b)return;const l=b.dataset.l;fLen=l===fLen&&l!=="All"?"All":l;renderList();};
+$("#statusSeg").onclick=e=>{const b=e.target.closest("[data-s]");if(!b)return;fStatus=b.dataset.s;renderList();};
+$("#sortBy").onchange=e=>{sortBy=e.target.value;renderList();};
+function setPanel(open){ $("#filterPanel").hidden=!open; $("#filterBtn").setAttribute("aria-expanded",String(open)); if(!open) $("#filterBtn").focus(); }
+$("#filterBtn").onclick=()=>setPanel($("#filterPanel").hidden);
+$("#filterDone").onclick=()=>{ setPanel(false); $("#list").scrollIntoView({behavior:"smooth",block:"start"}); };
+$("#list").onclick=e=>{const g=e.target.closest("[data-go]"); if(g){go(g.dataset.go);return;}
+  if(e.target.closest("[data-clear]")){ clearFilters(); return; }
+  const c=e.target.closest(".card");if(c)openDetail(+c.dataset.id);};
+$("#clearSamples").onclick=()=>{ const gone=items.filter(i=>i.sample), keep=items.filter(i=>!i.sample); items=keep; renderList();
+  toastUndo(`Removed ${gone.length} sample saves.`,"Your list now",()=>{ items=[...items,...gone]; renderList(); }); };
+$("#keepSamples").onclick=()=>{ prefs.sampleHidden=true; renderList(); };
+$("#autoShame").checked=!!prefs.autoShame; $("#autoShame").onchange=e=>{ prefs.autoShame=e.target.checked; persist(); };
+$("#resetDemo").onclick=()=>{ try{ localStorage.removeItem(STORE); }catch(e){} location.reload(); };
+$("#gameBack").onclick=()=>go("court");
+function autoShame(){ if(!prefs.autoShame||shamedOnce||unwatched()<8)return; setTimeout(()=>{ toast(`${unwatched()} unwatched. Shame threshold reached.`,"Uh oh",2400); setTimeout(shame,1600); },2600); }
+$("#waitBtn").onclick=()=>go("game");
+$("#lvl").onclick=e=>{const b=e.target.closest("button");if(!b)return;level=+b.dataset.lv;$("#lvl").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));};
+$("#lvl").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.lv===level));
+
+/* ---------- roast ---------- */
+/* Roasts follow the joke skill: one specific mismatch from the user's own data, a setup that
+   points one way, a punchline that reveals a second reading of the same facts, twist word last. */
+function topWant(){ return items.filter(i=>!i.watched).sort((a,b)=>b.want-a.want)[0]||items[0]; }
+function ageDays(t){ const m=/(\d+)\s*(day|week|month)/.exec(t||""); return t==="yesterday"?1:m?+m[1]*({day:1,week:7,month:30}[m[2]]):0; }
+function oldest(){ return items.filter(i=>!i.watched).sort((x,y)=>ageDays(y.saved)-ageDays(x.saved))[0]||items[0]; }
+function since(i){ return i.saved==="yesterday"?"since yesterday":i.saved==="just now"?"for a whole minute":i.saved==="imported"?"since you imported it":"for "+i.saved.replace(/ ago$/,""); }
+const canned=[
+ [()=>`You've watched ${items.length-unwatched()} of your ${items.length} saves, which means ${unwatched()} movies still have something to look forward to.`,
+  ()=>`Your list is mostly ${favGenre()}. You know exactly what you like to save.`],
+ [()=>`You gave ${topWant().title} a ${topWant().want} out of 5 for "want." ${topWant().want} stars, zero minutes.`,
+  ()=>`Your most-saved genre is ${favGenre()}. Your most-watched genre is saving.`],
+ [()=>`Your unwatched queue is ${totalHours()} hours long. At this rate, your list will outlive the streaming services it's on.`,
+  ()=>`${oldest().title} has been in your queue ${since(oldest())}. It's not a recommendation anymore, it's a tenant.`],
+ [()=>`ATTENTION: ${unwatched()} MOVIES ARE BEING HELD IN YOUR QUEUE. The ransom is ${totalHours()} HOURS. You keep promising to pay it SOMEDAY.`,
+  ()=>`BREAKING: local person saves ${favGenre().toUpperCase()} at an alarming rate, watches NONE of it, still calls themself "a film person." The films have declined to comment.`],
+];
+let roastI=0, lastRoast="";
+function tonightLine(){ const u=unwatched(), hrs=totalHours();
+  if(!items.length) return "Nothing saved yet. Judge Flix is bored.";
+  if(!u) return `All ${items.length} watched. Judge Flix has nothing on you. Suspicious.`;
+  return `${u} to watch, ${hrs} hour${hrs===1?"":"s"} of it. ${u>=8?"Judge Flix is concerned.":u>=4?"Judge Flix is watching you.":"Judge Flix is almost impressed."}`; }
+function listSummary(){ return items.slice(0,40).map(i=>`${i.title} (${i.genres.join("/")}, ${i.type}, want ${i.want}/5, ${i.watched?"watched":"not watched"}, saved ${i.saved}${i.handle?" from "+i.handle:""}${i.caption?`, ${platOf(i)} caption: "${i.caption}"`:""}${i.notes?`, why saved: "${i.notes}"`:""})`).join("; "); }
+async function roast(){
+  const b=$("#roastBtn"); b.disabled=true; $("#roastTxt").textContent="Judging…"; audio();
+  const r=await askJSON(`You write the roasts inside "Q'd" (pronounced "queued"), an app where people save movie and TV recs from TikTok, Instagram Reels and YouTube Shorts and never watch them. Write ONE roast of this user's watchlist: one or two sentences, max 28 words.
+How to build it:
+1. Pick ONE specific mismatch in their data: a high "want" score on something never watched, ${totalHours()} hours unwatched, saved vs watched, what a video's caption or their own note promised vs what they did, how long something has waited. Roast that choice, not the person.
+2. The setup leads the listener to one natural reading. The punchline reveals a second reading that the same facts supported all along (the hinge can be a phrase with two meanings, a reversal of who serves whom, a metaphor made literal, or a reasonable rule taken too far).
+3. Use one comic engine only. No pun unless both meanings fit the premise. No random twist that the setup didn't support.
+4. Put the word that lands the twist at the very end. Never explain the joke. No "Have you ever noticed", no "starter pack", no "nobody:", no "walks into a bar".
+Tone: ${LEVEL_RULES[level]}.${lastRoast?` Use a different mismatch than your last roast: "${lastRoast}"`:""}
+Watchlist: ${listSummary()}.
+Reply with only JSON {"roast":"..."}`);
+  const line=(r.data&&r.data.roast)?String(r.data.roast):canned[level][roastI++%2](); lastRoast=line;
+  $("#roastLine").innerHTML=`<b>${LEVELS[level]}:</b> ${esc(line)}`;
+  speak(line,{pitch:level===3?1.25:1,rate:level===3?1.12:1.02});
+  b.disabled=false; $("#roastTxt").textContent="Again";
+}
+$("#roastBtn").onclick=roast;
+$("#tCourt").onclick=()=>go("court");
+$("#tMatch").onclick=()=>{ go("discover"); const b=$('#moreMode button[data-m="match"]'); if(b.getAttribute("aria-pressed")!=="true") b.click();
+  if(!deckQ.length) $('#matchMode button[data-mm="tailored"]').click(); $("#matchBox").scrollIntoView({behavior:"smooth",block:"start"}); };
+
+/* ---------- public shaming (fake) ---------- */
+function friendList(){ return $("#friends").value.split(",").map(s=>s.trim()).filter(Boolean).slice(0,5); }
+async function shame(){
+  const you=$("#yourName").value.trim()||"Your friend", fr=friendList().length?friendList():["Sam","Mom"];
+  audio(); shamedOnce=true;
+  const S=$("#shame"), T=$("#thread"); S.hidden=false; $("#chatFoot").hidden=true; T.innerHTML="";
+  $("#chatMembers").textContent=[you,...fr].join(", ");
+  const add=html=>{T.insertAdjacentHTML("beforeend",html);};
+  add(`<div class="sys">Q'd detected ${unwatched()} unwatched saves (${totalHours()} hours). Notifying your group chat…</div>`);
+  ping();
+  add(`<div class="bub me" id="typ"><span class="typing"><i></i><i></i><i></i></span></div>`);
+  const pr=askJSON(`You write a fake, funny "intervention" text that the app Q'd pretends to send to a user's group chat because they save movie recs and never watch them. User: ${you}. Friends in chat: ${fr.join(", ")}. Stats: ${items.length} saved, ${items.length-unwatched()} watched, ${totalHours()} hours unwatched, top genre ${favGenre()}. Tone: ${LEVEL_RULES[level]}. Write the app's message (max 30 words, mention ${you} by name and one specific title from: ${items.filter(i=>!i.watched).slice(0,6).map(i=>i.title).join(", ")}), then 2 short replies from 2 of the friends (max 12 words each, funny, in character; if "Mom" is a member she should reply). Reply with only JSON {"message":"...","replies":[{"from":"name","text":"..."}]}`);
+  const [r]=await Promise.all([pr,wait(1500)]);
+  let msg, reps;
+  if(r.data&&r.data.message){ msg=String(r.data.message); reps=Array.isArray(r.data.replies)?r.data.replies.slice(0,3):[]; }
+  else { const t=items.find(i=>!i.watched); msg=`URGENT: ${you} has saved ${items.length} movies and watched ${items.length-unwatched()}. ${t?t.title+" has been waiting "+t.saved+". ":""}Please check on them.`;
+    reps=[{from:fr.includes("Mom")?"Mom":fr[0],text:"honey are you ok"},{from:fr.find(f=>f!=="Mom")||fr[0],text:"I've known this for years"}]; }
+  $("#typ").outerHTML=`<div class="bub me">${esc(msg)}</div>`;
+  add(`<div class="sys">Delivered to ${esc(fr.join(", "))}</div>`); ping();
+  for(const rp of reps){ await wait(1300); add(`<div class="bub them"><span class="who">${esc(rp.from)}</span>${esc(rp.text)}</div>`); ping(); }
+  await wait(3200); $("#chatFoot").hidden=false;
+}
+$("#shameBtn").onclick=shame;
+$("#shameClose").onclick=()=>{$("#shame").hidden=true;};
+
+/* ---------- detail ---------- */
+function dots(name,val){ return `<div class="dots" data-k="${name}">${[1,2,3,4,5].map(n=>`<button class="${n<=val?"on":""}" data-v="${n}" aria-label="${n} of 5">${n}</button>`).join("")}</div>`; }
+let detailOpener=null;
+function openDetail(id){
+  detailOpener=document.activeElement;
+  const i=items.find(x=>x.id===id); if(!i)return; setTheme("");
+  const fm=film(i);
+  const imdb=fm?`https://www.imdb.com/title/${fm.imdb}/`:`https://www.imdb.com/find/?q=${encodeURIComponent(i.title+" "+i.year)}`;
+  const jw=`https://www.justwatch.com/us/search?q=${encodeURIComponent(i.title)}`;
+  const src=i.source==="letterboxd"?"your Letterboxd watchlist":i.source==="netflix"?"your Netflix viewing history":i.source==="paste"?"a list you pasted in":i.source==="search"?"the Moviebuff's search":i.source==="match"?"Match me":i.source==="shelf"?"the Moviebuff's shelf":i.source==="court"?"Decision Court (straight from OMDb)":`<span style="color:var(--text);font-weight:700">${esc(i.handle)}</span> on ${esc(platOf(i))}`;
+  $("#detail").innerHTML=`
+   <button class="back" id="back">‹ My list</button>
+   <div class="hero">${poster(i,1)}<div><div class="label">${i.type} · ${i.year} · ${lenLabel(i)}</div><h1 id="dTitle">${esc(i.title)}</h1>${fm?`<div class="imdbline">IMDb ${fm.r}/10${fm.d?` · Dir. ${esc(fm.d)}`:""}</div>`:""}${gtags(i)}</div></div>
+   <div class="panel"><div class="label">Where to watch</div>
+     <div class="row">${i.where.map(s=>`<a class="svc" href="${jw}" target="_blank" rel="noopener">${esc(s)}</a>`).join("")}</div>
+     <button class="btn primary wide" id="watchNow"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg>Watch now on ${esc(i.where[0])}</button>
+     <p class="fine">Streaming info is sample data or an AI best guess. The real app pulls it live from TMDB.</p></div>
+   <div class="panel quick"><div class="label">Watched it?</div>
+     <button class="btn ${i.watched?"primary":"ghost"} wide" id="markW">${i.watched?"Watched ✓":"Mark as watched"}</button></div>
+   <details class="more"><summary>Why you saved it, notes, rating and sharing</summary>
+   <div class="panel"><div class="label">Saved from</div>
+     <p>${src} · ${esc(i.saved)}${i.sample?" · sample save":""}</p>
+     ${i.caption?`<p style="font-style:italic">"${esc(i.caption)}"</p>`:""}
+     <div class="row">${i.link&&/^https:\/\//.test(i.link)?`<a class="link" href="${esc(i.link)}" target="_blank" rel="noopener">Original post ›</a>`:""}<a class="link" href="${imdb}" target="_blank" rel="noopener">IMDb page ›</a></div></div>
+   <div class="panel"><div class="label">Before watching</div>
+     <div class="field"><label>How badly do you want to watch this?</label>${dots("want",i.want)}</div>
+     <div class="field"><label for="n1">Why I saved it</label><textarea id="n1">${esc(i.notes)}</textarea></div></div>
+   <div class="panel"><div class="label">After watching</div>
+     <p class="fine" id="afterHint" ${i.watched?"hidden":""}>Mark it as watched to rate it.</p>
+     <div id="afterBox" ${i.watched?"":"hidden"} style="display:flex;flex-direction:column;gap:12px">
+      <div class="field"><label>Would you watch again?</label>${dots("after",i.after)}</div>
+      <div class="field"><label for="n2">What I liked and didn't</label><textarea id="n2">${esc(i.afterNotes)}</textarea></div></div></div>
+   <div class="panel"><div class="label">Recommend to a friend</div>
+     <div class="field"><label for="sn">Add a note</label><input id="sn" placeholder="You HAVE to see this because…"></div>
+     <button class="btn primary wide" id="shareBtn"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 9l5-5 5 5"/><path d="M5 14v5h14v-5"/></svg>Copy share message</button></div>
+   <button class="btn ghost wide" id="removeBtn" type="button" style="color:var(--bad);border-color:var(--bad)"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove from my list</button>
+   </details>`;
+  $("#sheet").hidden=false; $("#sheet").scrollTop=0; document.querySelector(".app").setAttribute("aria-hidden","true"); $("#back").focus();
+  $("#back").onclick=closeDetail;
+  $("#watchNow").onclick=()=>toast(`Opening ${i.title} in ${i.where[0]}… In the real app this jumps straight into the streaming app.`,"Watch now");
+  $("#n1").oninput=e=>{i.notes=e.target.value;persist();};
+  $("#removeBtn").onclick=()=>{ const k=items.indexOf(i); if(k<0)return; items.splice(k,1); closeDetail();
+    toastUndo(`Removed ${i.title}.`,"Removed",()=>{ items.splice(Math.min(k,items.length),0,i); renderList(); }); };
+  $("#detail").querySelectorAll(".dots").forEach(d=>d.onclick=e=>{const v=+e.target.dataset.v;if(!v)return;i[d.dataset.k]=v;persist();d.querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.v<=v));});
+  $("#markW").onclick=()=>{i.watched=!i.watched; persist(); const b=$("#markW"); b.textContent=i.watched?"Watched ✓":"Mark as watched"; b.className="btn "+(i.watched?"primary":"ghost"); $("#afterBox").hidden=!i.watched; $("#afterHint").hidden=i.watched; if(i.watched){ $("#detail details.more").open=true; } if(i.watched)toast(`Look at you actually watching things. Only ${unwatched()} to go.`);};
+  $("#n2").oninput=e=>{i.afterNotes=e.target.value;persist();};
+  $("#shareBtn").onclick=async()=>{const note=$("#sn").value.trim(); const msg=`Watch ${i.title} (${i.year}) on ${i.where[0]}${note?`. ${note}`:""}. Saved with Q'd.`;
+    try{await navigator.clipboard.writeText(msg);toast("Share message copied. Paste it in a text, DM or email.","Copied");}catch(e){$("#sn").value=msg;$("#sn").select();toast("Copy the message from the box above.","Almost");}};
+}
+function closeDetail(){ const id=$("#sheet").hidden?null:detailOpener&&detailOpener.dataset&&detailOpener.dataset.id; $("#sheet").hidden=true; document.querySelector(".app").removeAttribute("aria-hidden"); setTheme(fGenre==="All"?"":fGenre); renderList();
+  const back=id&&document.querySelector(`#list .card[data-id="${id}"]`)||(detailOpener&&detailOpener.isConnected?detailOpener:null)||$("#q"); try{ back.focus(); }catch(e){} }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("#sheet").hidden) closeDetail(); });
+
+/* ---------- save flows ---------- */
+$("#demoVids").innerHTML=demoVids.map((v,k)=>`<button class="tiktok vid" data-k="${k}">${poster(v.cands[0])}<span class="vt"><span class="h">${v.handle} · ${esc(v.platform||platformFrom(v.link))}</span><span class="c">${esc(v.caption)}</span></span></button>`).join("");
+$("#demoVids").onclick=e=>{const t=e.target.closest(".tiktok");if(!t)return;const v=demoVids[+t.dataset.k];$("#link").value=v.link;$("#cap").value=v.link+"\n"+v.caption;$("#needMore").hidden=true;analyze(v);};
+$("#analyzeBtn").onclick=()=>{ const s=splitBox(), cap=s.caption; $("#link").value=s.link;
+  if(!cap){ const p=platformFrom(s.link); $("#needTxt").textContent=s.link?`${p&&p!=="a video"?p+" link saved":"Link saved"}. Links don't say which movie it is, so give the AI one clue: a screenshot, or a few words about the video.`:"Paste a link, the caption, or a few words about the video."; $("#needMore").hidden=false; return; }
+  const d=demoVids.find(v=>v.caption===cap); analyze(d||{handle:handleFrom($("#link").value),caption:cap,link:$("#link").value.trim(),platform:platformFrom($("#link").value)}); };
+function platformFrom(l){ let host=""; try{ host=new URL(String(l||"").trim()).hostname.replace(/^www\.|^m\./,""); }catch(e){ return ""; }
+  if(/(^|\.)tiktok\.com$/.test(host)) return "TikTok";
+  if(/(^|\.)instagram\.com$/.test(host)) return "Instagram Reels";
+  if(host==="youtu.be"||/(^|\.)youtube\.com$/.test(host)) return "YouTube Shorts";
+  if(host==="fb.watch"||/(^|\.)facebook\.com$/.test(host)) return "Facebook Reels";
+  if(/(^|\.)snapchat\.com$/.test(host)) return "Snapchat";
+  if(host==="x.com"||host==="twitter.com") return "X";
+  if(/(^|\.)threads\.(net|com)$/.test(host)) return "Threads";
+  return "a video"; }
+const platOf=i=>i.platform||(i.handle&&/^@/.test(i.handle)?"TikTok":"a video");
+/* one box: pull any link out of the text, keep the rest as the caption */
+function splitBox(){ const t=$("#cap").value, m=t.match(/https?:\/\/\S+/i); return {link:m?m[0].replace(/[),.]+$/,""):"",caption:(m?t.replace(m[0]," "):t).replace(/\s+/g," ").trim()}; }
+$("#cap").addEventListener("input",()=>{ const s=splitBox(); $("#link").value=s.link; $("#needMore").hidden=true; $("#link").dispatchEvent(new Event("input")); });
+$("#typeCap").onclick=()=>{ $("#needMore").hidden=true; const c=$("#cap"); c.value=c.value.trim()+"\n"; c.focus(); c.setSelectionRange(c.value.length,c.value.length); };
+$("#link").addEventListener("input",e=>{ const p=platformFrom(e.target.value); $("#platHint").textContent=p&&p!=="a video"?`${p} link. Got it.`:p?"Any video link works. Add the caption below so the AI has clues.":"Works with TikTok, Instagram, YouTube, Facebook, Snapchat, X and Threads."; });
+function handleFrom(l){ const m=(l||"").match(/@[\w.]+/); return m?m[0]:"@someone"; }
+
+function onShot(file){ if(!file)return; if(!/^image\//.test(file.type)){toast("That isn't an image. Try a PNG or JPG screenshot.","Wrong file");return;}
+  const s=splitBox(); $("#needMore").hidden=true; analyze({image:file,handle:handleFrom(s.link),caption:s.caption,link:s.link,platform:platformFrom(s.link)}); }
+$("#shot").onchange=e=>{onShot(e.target.files[0]); e.target.value="";};
+const drop=$("#drop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>onShot(e.dataTransfer.files[0]));
+
+const CAND_SHAPE=`"candidates":[{"title":str,"year":int,"type":"Movie" or "TV","genres":[1-2 of ${JSON.stringify(GENRES)}],"runtime":minutes or null for TV,"seasons":int or null,"where":[1-2 likely US streaming services],"confidence":0-1,"why":"short reason"}]`;
+async function analyze(v){
+  const P=$("#scanPanel"); P.hidden=false; $("#result").innerHTML=""; const bar=$("#scanBar"); bar.style.width="0";
+  const prev=$("#shotPrev"); if(v.image){prev.src=URL.createObjectURL(v.image);prev.hidden=false;}else prev.hidden=true;
+  const S=v.image?["Reading on-screen text and captions","Scanning the scene for title cards and posters","Matching against the movie database","Checking where it's streaming"]
+                 :["Reading the caption and on-screen text","Picking out actors, plot and year clues","Matching against the movie database","Checking where it's streaming"];
+  $("#steps").innerHTML=S.map(s=>`<li>${s}</li>`).join(""); P.scrollIntoView({behavior:"smooth",block:"start"});
+  let aiP=null;
+  if(v.image){
+    aiP=askJSON(`This image is a screenshot from a short-form video (TikTok, Instagram Reel, YouTube Short, Facebook or Snapchat video, or similar) that recommends a movie or TV show.${v.platform&&v.platform!=="a video"?` It came from ${v.platform}.`:""} Ignore the app's own buttons, like counts and usernames. Identify the title using on-screen text, captions, title cards, posters, logos and what the scene shows. Do not identify real people from their faces; rely on visible text and context.${v.caption?` The user also pasted this caption: """${v.caption}"""`:""}
+Give 1-2 candidates, most likely first. If two titles are easily confused (remakes, same name), include both. Reply with only JSON {"evidence":["up to 4 very short things you noticed in the image"],${CAND_SHAPE}}`,{images:[v.image]});
+  } else {
+    aiP=askJSON(`A short-form video${v.platform&&v.platform!=="a video"?` on ${v.platform}`:""} recommends a movie or TV show. Identify it. Caption/transcript: """${v.caption}"""
+Give 1-2 candidates, most likely first. If two titles are easily confused (remakes, same name), include both. Reply with only JSON {"evidence":["up to 3 very short clues from the caption"],${CAND_SHAPE}}`);
+  }
+  const lis=[...$("#steps").children];
+  for(let k=0;k<lis.length;k++){ await wait(v.image?700:550); lis[k].classList.add("done"); bar.style.width=((k+1)/lis.length*100)+"%"; }
+  let cands=v.cands, evidence=v.evidence||[];
+  if(aiP){ const r=await aiP;
+    if(r.data&&Array.isArray(r.data.candidates)&&r.data.candidates.length){ cands=r.data.candidates; evidence=Array.isArray(r.data.evidence)?r.data.evidence.slice(0,4):[]; }
+    else if(v.cands){ cands=v.cands; evidence=["AI is off: showing the built-in sample answer",...(v.evidence||[])]; }
+    else { const why=r.err==="not_granted"?"AI access was declined. Reload and tap Allow to use matching."
+             :r.err==="unavailable"||r.err==="images_unavailable"?"AI matching isn't available in this view. Open the page in the Claude app or on claude.ai."
+             :r.err==="rate_limited"?"Too many requests right now. Wait a moment and try again."
+             :v.image?"Couldn't read a title from that screenshot. Try one where the caption or title text is visible.":"Couldn't match that caption. Add more detail, like an actor or plot point.";
+      $("#result").innerHTML=`<p class="errmsg">${esc(why)}</p>`; return; } }
+  cands=cleanCands(cands);
+  const sure=cands.length===1&&cands[0].confidence>=.85;
+  $("#result").innerHTML=(evidence.length?`<div class="label">What we noticed</div><div class="evidence">${evidence.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:"")
+   +`<div class="label">${sure?"Found it. Tap to save":"Did you mean…"}</div>`
+   +cands.map((c,k)=>`<button class="option" data-k="${k}">${poster(c)}<div><h3 style="margin:0;font-size:15px">${esc(c.title)} (${esc(c.year)})</h3><div class="meta">${esc(c.why||"")}</div></div><span class="conf">${Math.round(c.confidence*100)}%</span></button>`).join("");
+  $("#result").onclick=e=>{const o=e.target.closest(".option");if(o)save(cands[+o.dataset.k],v);};
+}
+const saveRoasts={Horror:"Another horror movie. The scariest part will be how long it sits here.",Comedy:"A comedy. Saving it was the fun part.","Sci-Fi":"Sci-fi. By the time you watch it, the future it predicts will be here.",Romance:"A romance. You're so good at the talking stage.",Drama:"A drama. The real tension is whether you'll ever press play.",Thriller:"A thriller. Don't worry, you'll never find out how it ends."};
+function save(c,v){
+  const it={id:nextId++,title:String(c.title),year:c.year,type:c.type,genres:c.genres,runtime:c.runtime,seasons:c.seasons,where:c.where,handle:v.handle||"@someone",platform:v.platform||platformFrom(v.link)||"a video",caption:v.caption||"",link:v.link||"",want:3,notes:"",watched:false,after:0,afterNotes:"",saved:"just now"};
+  items.unshift(it); $("#scanPanel").hidden=true; $("#cap").value=""; $("#link").value=""; $("#needMore").hidden=true;
+  go("list"); toastUndo(`Saved ${it.title}. ${saveRoasts[it.genres[0]]||""}`,"Saved",()=>{ items=items.filter(x=>x!==it); renderList(); });
+  autoShame();
+}
+
+/* ---------- the Moviebuff's shelf (real OMDb films you can save) ---------- */
+const SHELF=[
+{"imdb": "tt6751668", "genres": ["Thriller", "Drama"], "where": ["Hulu"], "note": "Watch it knowing nothing. Mind the stairs."},
+{"imdb": "tt0084787", "genres": ["Horror", "Sci-Fi"], "where": ["Peacock"], "note": "Carpenter's practical effects still beat most CGI."},
+{"imdb": "tt0118694", "genres": ["Romance", "Drama"], "where": ["Criterion Channel", "Max"], "note": "Slow motion, rain, qipaos. Pure mood."},
+{"imdb": "tt6710474", "genres": ["Sci-Fi", "Comedy"], "where": ["Paramount+"], "note": "Hot dog fingers. You'll understand."},
+{"imdb": "tt0113277", "genres": ["Crime", "Thriller"], "where": ["Prime Video"], "note": "The diner scene. De Niro and Pacino, finally."},
+{"imdb": "tt8613070", "genres": ["Romance", "Drama"], "where": ["Hulu"], "note": "Every shot looks like a painting. On purpose."},
+{"imdb": "tt1392190", "genres": ["Action", "Sci-Fi"], "where": ["Max"], "note": "Two hours, one chase, not a wasted frame."},
+{"imdb": "tt0112471", "genres": ["Romance", "Drama"], "where": ["Max"], "note": "Two strangers talk all night in Vienna. That's it. It's perfect."},
+{"imdb": "tt0364569", "genres": ["Thriller", "Action"], "where": ["Tubi"], "note": "The hallway fight is one unbroken take."},
+{"imdb": "tt4468740", "genres": ["Comedy"], "where": ["Max"], "note": "A perfect film. I am not joking."},
+{"imdb": "tt2278388", "genres": ["Comedy", "Drama"], "where": ["Hulu"], "note": "Wes Anderson at his most Wes Anderson."},
+{"imdb": "tt0078748", "genres": ["Horror", "Sci-Fi"], "where": ["Hulu"], "note": "In space, no one can hear you scream. Still true."}
+];
+/* OMDb films that aren't on the shelf but can still be picked in Decision Court */
+const EXTRA=[{"imdb":"tt5040012","genres":["Horror","Drama"],"where":["Peacock"],"note":"Eggers made a gothic nightmare. Lights off."},{"imdb":"tt0013442","genres":["Horror"],"where":["Tubi","Prime Video"],"note":"The original vampire. A century old, still creepy."},{"imdb":"tt0386676","type":"TV","seasons":9,"genres":["Comedy"],"where":["Peacock"],"note":"The ultimate comfort rewatch."},
+{"imdb": "tt0081505", "genres": ["Horror"], "where": ["Max"], "note": "Here's Johnny. The hedge maze still haunts people."},
+{"imdb": "tt8772262", "genres": ["Horror", "Drama"], "where": ["Max"], "note": "A breakup movie in broad daylight. Deeply upsetting."},
+{"imdb": "tt6644200", "genres": ["Horror", "Thriller"], "where": ["Paramount+"], "note": "You'll hold your breath for 90 minutes."},
+{"imdb": "tt3235888", "genres": ["Horror"], "where": ["Tubi"], "note": "The slowest walker in horror is the scariest."},
+{"imdb": "tt2321549", "genres": ["Horror", "Drama"], "where": ["Tubi"], "note": "Grief wearing a top hat. Genuinely great."},
+{"imdb": "tt0829482", "genres": ["Comedy"], "where": ["Netflix"], "note": "McLovin. That's the whole pitch."},
+{"imdb": "tt8946378", "genres": ["Crime", "Comedy"], "where": ["Prime Video"], "note": "A whodunit with a sweater that became a meme."},
+{"imdb": "tt1489887", "genres": ["Comedy"], "where": ["Hulu"], "note": "Superbad's smarter little sister."},
+{"imdb": "tt3416742", "genres": ["Comedy", "Horror"], "where": ["Max"], "note": "Vampire flatmates arguing about the dishes."},
+{"imdb": "tt0816692", "genres": ["Sci-Fi", "Drama"], "where": ["Paramount+"], "note": "The docking scene. The organ. Goosebumps."},
+{"imdb": "tt1856101", "genres": ["Sci-Fi", "Thriller"], "where": ["Netflix"], "note": "Every frame could hang in a gallery."},
+{"imdb": "tt0470752", "genres": ["Sci-Fi", "Thriller"], "where": ["Max"], "note": "Three people, one house, one very smart robot."},
+{"imdb": "tt15239678", "genres": ["Sci-Fi", "Drama"], "where": ["Max"], "note": "Sandworm riding on the biggest screen you can find."},
+{"imdb": "tt0133093", "genres": ["Sci-Fi", "Thriller"], "where": ["Max"], "note": "Still the coolest movie ever made in 1999."},
+{"imdb": "tt3783958", "genres": ["Romance", "Drama"], "where": ["Netflix"], "note": "That ending. You'll argue about it for years."},
+{"imdb": "tt0414387", "genres": ["Romance", "Drama"], "where": ["Peacock"], "note": "The hand flex. Enough said."},
+{"imdb": "tt5726616", "genres": ["Romance", "Drama"], "where": ["Netflix"], "note": "One Italian summer and a peach. Devastating."},
+{"imdb": "tt3104988", "genres": ["Romance", "Comedy"], "where": ["Max"], "note": "The mahjong scene is a masterclass."},
+{"imdb": "tt2582802", "genres": ["Drama"], "where": ["Netflix"], "note": "Not quite my tempo. A thriller with drums."},
+{"imdb": "tt4975722", "genres": ["Drama"], "where": ["Netflix"], "note": "Three chapters, one life, zero wasted moments."},
+{"imdb": "tt19770238", "genres": ["Drama"], "where": ["Paramount+"], "note": "A holiday video that quietly breaks you."},
+{"imdb": "tt0068646", "genres": ["Crime", "Drama"], "where": ["Paramount+"], "note": "An offer you really can't refuse."},
+{"imdb": "tt2267998", "genres": ["Thriller", "Drama"], "where": ["Netflix"], "note": "The Cool Girl monologue. Chilling."},
+{"imdb": "tt1392214", "genres": ["Thriller", "Drama"], "where": ["Max"], "note": "Two and a half hours of pure dread."},
+{"imdb": "tt0477348", "genres": ["Crime", "Thriller"], "where": ["Paramount+"], "note": "Call it, friendo. A coin toss you'll never forget."},
+{"imdb": "tt0903747", "genres": ["Crime", "Drama"], "where": ["Netflix"], "note": "Mr. White becomes someone else. Say my name.", "type": "TV", "seasons": 5},
+{"imdb": "tt4574334", "genres": ["Sci-Fi", "Horror"], "where": ["Netflix"], "note": "80s kids, bikes and a monster. Pure nostalgia.", "type": "TV", "seasons": 5},
+{"imdb": "tt5687612", "genres": ["Comedy", "Drama"], "where": ["Prime Video"], "note": "Two seasons, zero wasted minutes. The priest.", "type": "TV", "seasons": 2},
+{"imdb": "tt7660850", "genres": ["Drama", "Comedy"], "where": ["Max"], "note": "Rich people being horrible, brilliantly.", "type": "TV", "seasons": 4},
+{"imdb": "tt2788316", "genres": ["Drama", "Thriller"], "where": ["Hulu"], "note": "Epic, gorgeous and swept every award.", "type": "TV", "seasons": 3},
+{"imdb": "tt5875444", "genres": ["Thriller", "Comedy"], "where": ["Apple TV+"], "note": "Gary Oldman as a gloriously gross spy boss.", "type": "TV", "seasons": 8}];
+const shelfFilm=s=>FILMS.find(f=>f.imdb===s.imdb);
+function filmItem(s,forCourt){ const f=shelfFilm(s);
+  return {id:nextId++,title:f.t,year:f.y,type:s.type||"Movie",genres:s.genres,runtime:s.type==="TV"?null:f.m,seasons:s.seasons||null,where:s.where,
+    handle:forCourt?"OMDb (not on your list yet)":"The Moviebuff's shelf",source:forCourt?"court":"shelf",caption:s.note||"",link:"",want:3,notes:"",watched:false,after:0,afterNotes:"",saved:forCourt?"never":"just now"}; }
+function renderShelf(){ const el=$("#shelf"); if(!el)return;
+  const left=SHELF.filter(s=>!items.some(i=>film(i)===shelfFilm(s)));
+  el.innerHTML=left.length?left.map(s=>{const f=shelfFilm(s); return `<button class="pick" data-imdb="${s.imdb}">${poster({title:f.t,year:f.y,genres:s.genres},1)}<b>${esc(f.t)}</b><span class="by">${f.y} · Dir. ${esc(f.d)}</span><span class="imdb">IMDb ${f.r} · + Save</span><q>${esc(s.note)}</q></button>`;}).join("")
+   :`<p class="fine">You saved the whole shelf. Now watch something.</p>`; requestAnimationFrame(shelfArrows); }
+/* left/right arrows, plus drag to scroll with a mouse */
+function shelfArrows(){ const r=$("#shelf"); $("#shelfPrev").disabled=r.scrollLeft<=4; $("#shelfNext").disabled=r.scrollLeft+r.clientWidth>=r.scrollWidth-4; }
+$("#shelfPrev").onclick=()=>$("#shelf").scrollBy({left:-$("#shelf").clientWidth*.8,behavior:"smooth"});
+$("#shelfNext").onclick=()=>$("#shelf").scrollBy({left:$("#shelf").clientWidth*.8,behavior:"smooth"});
+$("#shelf").addEventListener("scroll",shelfArrows,{passive:true}); window.addEventListener("resize",shelfArrows);
+let drag=null, dragMoved=false;
+$("#shelf").addEventListener("pointerdown",e=>{ if(e.pointerType!=="mouse")return; drag={x:e.clientX,left:$("#shelf").scrollLeft}; dragMoved=false; });
+window.addEventListener("pointermove",e=>{ if(!drag)return; const dx=e.clientX-drag.x; if(Math.abs(dx)>5){ dragMoved=true; $("#shelf").classList.add("dragging"); } if(dragMoved) $("#shelf").scrollLeft=drag.left-dx; });
+window.addEventListener("pointerup",()=>{ drag=null; $("#shelf").classList.remove("dragging"); });
+$("#shelf").onclick=e=>{ if(dragMoved){ dragMoved=false; return; } const b=e.target.closest(".pick"); if(!b)return; const it=filmItem(SHELF.find(x=>x.imdb===b.dataset.imdb));
+  items.unshift(it); renderList(); toastUndo(`Saved ${it.title}. ${saveRoasts[it.genres[0]]||""}`,"Saved",()=>{ items=items.filter(x=>x!==it); renderList(); });
+  autoShame(); };
+
+/* ---------- "More films": keyword search by the Moviebuff (AI) ---------- */
+let moreResults=[];
+$("#moreMode").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; const m=b.dataset.m;
+  $("#moreMode").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  $("#moreForm").hidden=m!=="search"; $("#matchBox").hidden=m!=="match";
+  if(m==="search") $("#moreQ").focus(); };
+$("#matchMode").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; $("#matchMode").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); startMatch(b.dataset.mm); };
+
+/* ---------- "Match me": swipe through posters that aren't on your list ---------- */
+let deckQ=[], deckIdx=0, matched=[], matchMode="", dealing=0, lastSwipe=null;
+/* titles with real posters baked in; the AI is asked to prefer these so cards show posters */
+/* every library title not on the list; these have real posters */
+function posterFilms(){ return FILMS.filter(f=>!items.some(i=>film(i)===f)); }
+function posterTitles(){ return posterFilms().map(f=>`${f.t} (${f.y})`).join("; "); }
+function libMeta(f){ return [...SHELF,...EXTRA].find(x=>x.imdb===f.imdb)||{}; }
+function candFromFilm(f){ const x=libMeta(f), tv=x.type==="TV"||!!f.tv;
+  return {title:f.t,year:f.y,type:tv?"TV":"Movie",genres:x.genres||f.g||["Drama"],runtime:tv?null:(f.m||110),seasons:x.seasons||f.s||1,where:x.where||["Check JustWatch"],note:x.note||(f.d?`Dir. ${f.d}. IMDb ${f.r}.`:`IMDb ${f.r}.`),lib:1}; }
+/* instant search of the poster library: title, director, year, genre and the shelf note */
+function libSearch(q){ const words=norm(q).split(" ").filter(w=>w.length>2&&!["the","and","with","movie","movies","film","films","show","shows","something"].includes(w)); if(!words.length) return [];
+  return posterFilms().map(f=>{ const c=candFromFilm(f), hay=norm([f.t,f.a,f.d,f.y,c.genres.join(" "),c.type==="TV"?"tv series show":"movie film",c.note].join(" "));
+    return {c,s:words.filter(w=>hay.includes(w)).length}; }).filter(x=>x.s).sort((a,b)=>b.s-a.s).slice(0,8).map(x=>x.c); }
+const libCand=x=>{ const f=shelfFilm(x); return {title:f.t,year:f.y,type:x.type||"Movie",genres:x.genres,runtime:x.type==="TV"?null:f.m,seasons:x.seasons||null,where:x.where,note:x.note||""}; };
+function genreCounts(){ const c={}; GENRES.forEach(g=>c[g]=0); items.forEach(i=>i.genres.forEach(g=>{ if(g in c)c[g]++; })); return c; }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+/* backup decks from the built-in OMDb library, used when the AI isn't available */
+function libraryDeck(mode){ const gc=genreCounts(), pool=[...SHELF,...EXTRA].filter(x=>!items.some(i=>film(i)===shelfFilm(x))).map(libCand);
+  if(mode==="tailored"){ const top=items.filter(i=>!i.watched);
+    return pool.map(c=>({c,score:c.genres.reduce((n,g)=>n+gc[g],0)+Math.random()})).sort((x,y)=>y.score-x.score).slice(0,10).map(({c})=>{
+      const near=top.find(i=>i.genres.some(g=>c.genres.includes(g))); return {...c,why:near?`Because you saved ${near.title}`:""}; }); }
+  return shuffle(pool).sort((x,y)=>Math.min(...x.genres.map(g=>gc[g]))-Math.min(...y.genres.map(g=>gc[g]))).slice(0,10).map(c=>{ const g=[...c.genres].sort((x,y)=>gc[x]-gc[y])[0]; return {...c,why:gc[g]===0?`New genre for you: ${g}`:`Rare for you: ${g}`}; }); }
+async function startMatch(mode){ mode=mode||matchMode||"random"; matchMode=mode; const my=++dealing;
+  $("#matchPick").hidden=true; $("#matchHint").hidden=true; $("#matchBtns").hidden=true;
+  $("#deck").innerHTML=`<div class="msum"><h3>Shuffling the deck…</h3><p>${mode==="tailored"?"The Moviebuff is studying your list.":"The Moviebuff is raiding every aisle of the video store."}</p></div>`;
+  const gc=genreCounts(), never=GENRES.filter(g=>!gc[g]), have=items.slice(0,40).map(i=>`${i.title} (${i.genres.join("/")}, want ${i.want}/5${i.watched?", watched":""})`).join("; ");
+  const shape=`Reply with only JSON {"films":[{"title":str,"year":int,"type":"Movie" or "TV","genres":[1-2 of ${JSON.stringify(GENRES)}],"runtime":minutes or null for TV,"seasons":int or null,"where":[1-2 likely US streaming services],"why":"max 6 words","note":"max 12 words, enthusiastic film-nerd voice"}]}`;
+  const prompt=mode==="tailored"
+   ?`You are a film buff inside Q'd, a movie app. Here is the user's watchlist: ${have}. Suggest 10 films or shows that are CLOSE matches to their taste (same genres, directors, tone or era as the titles they want most), none already on the list. Pick at least 8 of the 10 from this list, which has real posters: ${posterTitles()}. For "why", write "Because you saved <one title from their list>". ${shape}`
+   :`You are a film buff inside Q'd, a movie app. Suggest 10 wildcard films or shows spread across at least 6 different genres, deliberately including titles the user has no connection with. Their genre counts: ${JSON.stringify(gc)}${never.length?`; they have never saved ${never.join(", ")}`:""}. Avoid anything on their list: ${items.slice(0,40).map(i=>i.title).join("; ")}. Mix eras and countries. Pick at least 8 of the 10 from this list, which has real posters: ${posterTitles()}. For "why", say what makes it a wildcard, like "New genre for you: Romance". ${shape}`;
+  const r=await askJSON(prompt,{modelTier:"default"}); if(my!==dealing) return;
+  let cards=(r.data&&Array.isArray(r.data.films))?cleanCands(r.data.films.filter(c=>c&&c.title).map(c=>({...c,title:String(c.title).slice(0,120),note:String(c.note||"").slice(0,120),why:String(c.why||"").slice(0,60)}))):[];
+  const onList=new Set(items.map(i=>norm(i.title))), seen=new Set(); cards=cards.filter(c=>{ const k=norm(c.title); if(onList.has(k)||seen.has(k))return false; seen.add(k); return true; }).slice(0,10);
+  if(cards.length<5) cards=libraryDeck(mode);
+  deckQ=cards; deckIdx=0; matched=[]; lastSwipe=null; renderDeck(); }
+function cardHTML(c,k){ const f=film(c), gr=GRAD[c.genres[0]]||GRAD.Drama;
+  const art=f?`<img src="${posterSrc(f,1)}" alt="${esc(c.title)} poster" draggable="false">`:`<div class="mposter" style="background:linear-gradient(160deg,${gr[1]},${gr[0]})">${esc(c.title)}</div>`;
+  return `<div class="mcard" data-k="${k}">${art}<span class="mst yes">Q'D</span><span class="mst no">PASS</span><div class="minfo">${c.why?`<span class="why">${esc(c.why)}</span>`:""}<b>${esc(c.title)}</b><span>${esc(c.year)}${f&&f.d?` · Dir. ${esc(f.d)}`:""}${f?` · IMDb ${f.r}`:` · ${esc(c.genres.join(" / "))}`}</span>${c.note?`<q>${esc(c.note)}</q>`:""}</div></div>`; }
+function renderDeck(){ const d=$("#deck"), btns=$("#matchBtns");
+  if(!deckQ.length){ d.innerHTML=`<div class="msum"><h3>You've seen them all</h3><p>Nothing new to deal right now. Try Search instead.</p></div>`; btns.hidden=true; $("#matchHint").hidden=true; return; }
+  if(deckIdx>=deckQ.length){ btns.hidden=true; $("#matchHint").hidden=true;
+    d.innerHTML=`<div class="msum"><h3>${matched.length?`You Q'd ${matched.length} film${matched.length>1?"s":""}`:"No matches this round"}</h3><p>${matched.length?esc(matched.join(", "))+". They're on your list now.":"Tough crowd. Shuffle for another round."}</p><div class="twobtn"><button class="btn ghost" id="mBack" type="button"${lastSwipe?"":" disabled"}>Undo last</button><button class="btn primary" id="mAgain" type="button">Deal 10 more</button></div></div>`;
+    $("#mAgain").onclick=()=>startMatch(matchMode); $("#mBack").onclick=()=>$("#mUndo").click(); return; }
+  btns.hidden=false; $("#matchHint").hidden=false; $("#mUndo").disabled=!lastSwipe;
+  d.innerHTML=deckQ.slice(deckIdx,deckIdx+3).map((s,j)=>cardHTML(s,deckIdx+j)).reverse().join("");
+  $("#mCount").textContent=`${deckIdx+1} of ${deckQ.length}`; bindSwipe(d.lastElementChild); }
+function decide(yes){ const top=$("#deck .mcard:last-child"); if(!top||top.dataset.gone)return; top.dataset.gone="1";
+  const c=deckQ[deckIdx]; top.style.setProperty(yes?"--yes":"--no",1); lastSwipe={idx:deckIdx,item:null};
+  top.style.transition="transform .35s ease-in, opacity .35s"; top.style.transform=`translate(${yes?480:-480}px,30px) rotate(${yes?26:-26}deg)`; top.style.opacity="0";
+  if(yes){ const it={id:nextId++,title:c.title,year:c.year,type:c.type,genres:c.genres,runtime:c.runtime,seasons:c.seasons,where:c.where,handle:matchMode==="tailored"?"Match me (tailored)":"Match me (random)",source:"match",caption:c.note||"",link:"",want:4,notes:"",watched:false,after:0,afterNotes:"",saved:"just now"}; items.unshift(it); matched.push(it.title); lastSwipe.item=it; renderList(); ping();
+    autoShame(); }
+  deckIdx++; setTimeout(renderDeck,320); }
+function bindSwipe(card){ if(!card)return; let sx=0,dx=0,on=false;
+  const set=v=>{ card.style.transform=`translateX(${v}px) rotate(${v/18}deg)`; card.style.setProperty("--yes",Math.max(0,Math.min(1,v/110))); card.style.setProperty("--no",Math.max(0,Math.min(1,-v/110))); };
+  card.addEventListener("pointerdown",e=>{ on=true; sx=e.clientX; dx=0; card.style.transition="none"; try{card.setPointerCapture(e.pointerId);}catch(_){} });
+  card.addEventListener("pointermove",e=>{ if(!on)return; dx=e.clientX-sx; set(dx); });
+  const end=()=>{ if(!on)return; on=false; if(Math.abs(dx)>90) decide(dx>0); else { card.style.transition="transform .25s"; set(0); card.style.transform=""; } };
+  card.addEventListener("pointerup",end); card.addEventListener("pointercancel",end); }
+$("#mUndo").onclick=()=>{ const s=lastSwipe; if(!s)return; lastSwipe=null;
+  if(s.item){ items=items.filter(x=>x!==s.item); const k=matched.indexOf(s.item.title); if(k>=0)matched.splice(k,1); renderList(); }
+  deckIdx=s.idx; renderDeck(); toast(s.item?`Took ${s.item.title} back off your list.`:"That card is back.","Undo",1800); };
+$("#mYes").onclick=()=>decide(true); $("#mNope").onclick=()=>decide(false);
+$("#deck").addEventListener("keydown",e=>{ if(e.key==="ArrowRight"){e.preventDefault();decide(true);} if(e.key==="ArrowLeft"){e.preventDefault();decide(false);} });
+function renderMore(){ const el=$("#moreRail"); const left=moreResults.filter(c=>!c.saved);
+  el.innerHTML=left.map(c=>{ const f=film(c); return `<button class="pick" type="button" data-k="${moreResults.indexOf(c)}">${poster(c,1)}<b>${esc(c.title)}</b><span class="by">${esc(c.year)} · ${esc(c.type==="TV"?"TV":lenLabel(c))}</span><span class="imdb">${f?`IMDb ${f.r} · `:""}+ Save</span><q>${esc(c.note||c.why||"")}</q></button>`; }).join(""); }
+$("#moreForm").onsubmit=async e=>{ e.preventDefault(); const q=$("#moreQ").value.trim(); if(!q){toast("Type a mood, actor, director or keyword.","Search");return;}
+  const b=$("#moreGo"); b.disabled=true; b.textContent="Digging…";
+  const local=libSearch(q); moreResults=local; if(local.length){ renderMore(); $("#moreRail").insertAdjacentHTML("beforeend",`<p class="fine" id="moreWait">The Moviebuff is digging for more…</p>`); } else $("#moreRail").innerHTML=`<p class="fine">The Moviebuff is digging through the stacks…</p>`;
+  const have=items.map(i=>i.title).slice(0,40).join("; ");
+  const r=await askJSON(`You are a passionate film buff inside Q'd, a movie app. Suggest 8 films or TV shows that match this search: """${q}""". Mix one or two well-known picks with deeper cuts. Pick at least 6 of the 8 from this list, because these have real posters, and only go outside it for titles that fit the search much better: ${posterTitles()}. Skip titles the user already has: ${have}.
+For each give the real title and year, type "Movie" or "TV", 1-2 genres from ${JSON.stringify(GENRES)}, runtime in minutes (null for TV), seasons for TV, 1-2 likely US streaming services, and a note of at most 12 words in an enthusiastic film-nerd voice. Reply with only JSON {"films":[{"title":str,"year":int,"type":str,"genres":[..],"runtime":int or null,"seasons":int or null,"where":[..],"note":str}]}`,{modelTier:"default"});
+  b.disabled=false; b.textContent="Search";
+  if(!(r.data&&Array.isArray(r.data.films)&&r.data.films.length)){ if(local.length){ renderMore(); return; } $("#moreRail").innerHTML=`<p class="fine">${r.err==="rate_limited"?"Too many searches right now. Wait a moment and try again.":r.err==="unavailable"||r.err==="not_granted"?"Search needs the AI, which isn't available in this view. Open the demo in the Claude app or on claude.ai.":"No matches for that. Try different words."}</p>`; return; }
+  const ai=cleanCands(r.data.films.slice(0,8).filter(c=>c&&c.title).map(c=>({...c,title:String(c.title).slice(0,120),note:String(c.note||"").slice(0,120)})));
+  const seen=new Set(), onList=new Set(items.map(i=>norm(i.title)));
+  moreResults=[...ai,...local].filter(c=>{ const k=norm(c.title); if(seen.has(k)||onList.has(k)) return false; seen.add(k); return true; })
+    .sort((a,b)=>(film(b)?1:0)-(film(a)?1:0)).slice(0,10); renderMore(); };
+$("#moreRail").onclick=e=>{ const b=e.target.closest(".pick"); if(!b)return; const c=moreResults[+b.dataset.k]; if(!c||c.saved)return; c.saved=true;
+  const it={id:nextId++,title:c.title,year:c.year,type:c.type,genres:c.genres,runtime:c.runtime,seasons:c.seasons,where:c.where,handle:"The Moviebuff's search",source:"search",caption:c.note||"",link:"",want:3,notes:"",watched:false,after:0,afterNotes:"",saved:"just now"};
+  items.unshift(it); renderList(); renderMore(); toastUndo(`Saved ${it.title}. ${saveRoasts[it.genres[0]]||""}`,"Saved",()=>{ items=items.filter(x=>x!==it); c.saved=false; renderList(); renderMore(); });
+  autoShame(); };
+
+/* ---------- Letterboxd import (CSV export, no API needed) ---------- */
+function parseCSV(t){const out=[];let row=[],f="",q=false;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}else if(c==='"')q=true;else if(c===','){row.push(f);f="";}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);out.push(row);row=[];f="";}else f+=c;}if(f||row.length){row.push(f);out.push(row);}return out.filter(r=>r.some(x=>x.trim()));}
+async function importFilms(films,o){
+  const onList=new Set(items.map(i=>norm(i.title))); const before=films.length; films=films.filter(f=>!onList.has(norm(f.title)));
+  if(!films.length){ toast(`All ${before} titles are already on your list.`,"Nothing new"); return; }
+  const P=$("#scanPanel"); go("add"); P.hidden=false; $("#shotPrev").hidden=true; $("#result").innerHTML=""; $("#scanBar").style.width="0";
+  $("#steps").innerHTML=[`Reading ${films.length} titles from ${o.from}`,"Tagging genres and runtimes","Guessing where each one streams"].map(s=>`<li>${s}</li>`).join(""); P.scrollIntoView({behavior:"smooth"});
+  const lis=[...$("#steps").children]; lis[0].classList.add("done"); $("#scanBar").style.width="33%";
+  const r=await askJSON(`For each title below, give its genres (1-2 of ${JSON.stringify(GENRES)}), runtime in minutes (null for TV), type ("Movie" or "TV"), seasons for TV, release year, and 1-2 likely US streaming services. Keep the same order and titles. Reply with only a JSON array: [{"title":str,"year":int,"genres":[..],"runtime":int or null,"type":"Movie" or "TV","seasons":int or null,"where":[..]}]
+Titles: ${films.map(f=>`${f.title}${f.year?" ("+f.year+")":""}`).join("; ")}`);
+  lis[1].classList.add("done"); lis[2].classList.add("done"); $("#scanBar").style.width="100%";
+  const tags=Array.isArray(r.data)?r.data:[];
+  const fresh=films.map((f,k)=>{ const t=tags[k]||{}; const c=cleanCands([{...t,title:f.title,year:f.year||t.year}])[0];
+    return {id:nextId++,title:f.title,year:f.year||(+t.year||""),type:c.type,genres:c.genres,runtime:c.runtime,seasons:c.seasons,where:c.where,handle:o.handle,source:o.source,caption:"",link:/^https:\/\//.test(f.link||"")?f.link:"",want:3,notes:"",watched:!!o.watched,after:0,afterNotes:"",saved:"imported"}; });
+  items=[...fresh,...items]; P.hidden=true; go("list");
+  toast(`Imported ${fresh.length} titles from ${o.label}${tags.length?"":" (without AI tags)"}. Roast incoming.`,"Imported");
+  setTimeout(roast,1400);
+}
+$("#lbx").onchange=async e=>{
+  const file=e.target.files[0]; e.target.value=""; if(!file)return;
+  const rows=parseCSV(await file.text()); const h=(rows[0]||[]).map(s=>s.trim());
+  const ni=h.indexOf("Name"), yi=h.indexOf("Year"), ui=h.findIndex(x=>/uri|url/i.test(x));
+  if(ni<0){toast("That doesn't look like a Letterboxd watchlist.csv. It should have Name and Year columns.","Wrong file");return;}
+  const films=rows.slice(1).map(r=>({title:(r[ni]||"").trim(),year:+(r[yi]||0)||null,link:ui>=0?(r[ui]||"").trim():""})).filter(f=>f.title).slice(0,40);
+  if(!films.length){toast("No films found in that file.","Empty");return;}
+  importFilms(films,{from:"your Letterboxd export",label:"Letterboxd",handle:"Letterboxd",source:"letterboxd"});
+};
+/* Netflix viewing history: "Title","Date" rows, newest first. Episodes look like "Show: Season 2: Episode name". */
+$("#nfx").onchange=async e=>{
+  const file=e.target.files[0]; e.target.value=""; if(!file)return;
+  const rows=parseCSV(await file.text()); const h=(rows[0]||[]).map(s=>s.trim().toLowerCase()); const ti=h.indexOf("title");
+  if(ti<0){toast("That doesn't look like NetflixViewingHistory.csv. It should have Title and Date columns.","Wrong file");return;}
+  const seen=new Set(), films=[];
+  for(const r of rows.slice(1)){ let t=(r[ti]||"").trim(); if(!t)continue;
+    const m=t.match(/^(.*?):\s*(Season|Series|Limited Series|Part|Volume|Book|Chapter|Collection)\b/i); if(m)t=m[1].trim();
+    const k=t.toLowerCase(); if(seen.has(k))continue; seen.add(k); films.push({title:t,year:null}); if(films.length>=40)break; }
+  if(!films.length){toast("No titles found in that file.","Empty");return;}
+  importFilms(films,{from:"your Netflix history",label:"Netflix",handle:"Netflix history",source:"netflix",watched:true});
+};
+$("#pasteBtn").onclick=()=>{
+  const seen=new Set(), films=[];
+  for(let line of $("#pasteList").value.split(/\n+/)){ line=line.replace(/^[\s\-•*\d.)]+/,"").trim(); if(!line)continue;
+    const m=line.match(/^(.*?)\s*\((\d{4})\)\s*$/), t=(m?m[1]:line).slice(0,120), y=m?+m[2]:null, k=t.toLowerCase();
+    if(seen.has(k))continue; seen.add(k); films.push({title:t,year:y}); if(films.length>=40)break; }
+  if(!films.length){toast("Type or paste at least one title, one per line.","Nothing to import");return;}
+  $("#pasteList").value=""; importFilms(films,{from:"your list",label:"your list",handle:"Your streaming watchlist",source:"paste"});
+};
+$("#impTabs").onclick=e=>{ const b=e.target.closest("button"); if(!b)return; $("#impTabs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  ["netflix","letterboxd","any"].forEach(k=>$("#imp-"+k).hidden=k!==b.dataset.imp); };
+
+/* ---------- court ---------- */
+const cannedVerdicts=[
+ (a,b,ta,tb)=>({winner:"A",verdict:`The court has reviewed the evidence. ${ta.title} has sat in this queue with a want score of ${ta.want}. That is emotional neglect.`,sentence:`${b} plays Popcorn Panic, must score 15, and fetches the snacks.`}),
+ (a,b,ta,tb)=>({winner:"B",verdict:`Objection sustained. Nobody wants to start ${ta.type==="TV"?"a whole series":ta.title} at this hour. ${tb.title} wins on vibes alone.`,sentence:`${a} plays Popcorn Panic and surrenders the good side of the couch.`}),
+];
+let vI=0;
+/* Judge Flix subpoenas evidence: the AI calls these page functions (sample "tools")
+   mid-trial, and each call slams an exhibit card onto the screen. */
+const EX="ABCDEFGH";
+function titleRecord(t){ return {title:t.title,year:t.year,length:lenLabel(t),genres:t.genres,saved:t.saved,want_to_watch:`${t.want}/5`,
+  why_saved:t.notes||"(no reason given)",recommended_by:t.source==="letterboxd"?"their own Letterboxd watchlist":t.handle+(t.caption&&/^@/.test(t.handle||"")?` on ${platOf(t)}`:""),tiktok_caption:t.caption||"(none)",streaming_on:t.where}; }
+function genreHistory(g){ const all=items.filter(i=>i.genres.includes(g)), w=all.filter(i=>i.watched);
+  return {genre:g,saved:all.length,watched:w.length,never_watched:all.filter(i=>!i.watched).map(i=>i.title).slice(0,5),
+    ratings_after_watching:w.map(i=>`${i.title}: ${i.after||"?"}/5${i.afterNotes?` ("${i.afterNotes}")`:""}`)}; }
+function addExhibit(head,lines){ const box=$("#exhibits"); if(!box)return ""; const L=EX[box.children.length]||"Z";
+  box.insertAdjacentHTML("beforeend",`<div class="exhibit"><span class="stamp">FILED</span><span class="tag">Exhibit ${L}</span><b>${esc(head)}</b><ul>${lines.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`);
+  if(voiceOn){const a=audio(); if(a)knock(a.currentTime+.02);} return L; }
+function showTitleExhibit(t){ const r=titleRecord(t); return addExhibit(`The record of ${t.title}`,[`Saved ${r.saved}, recommended by ${r.recommended_by}`,`Want-to-watch score: ${r.want_to_watch}`,`Why saved: ${r.why_saved}`]); }
+function showHistoryExhibit(g){ const h=genreHistory(g); return addExhibit(`${g} viewing history`,[`${h.saved} saved, ${h.watched} actually watched`,h.ratings_after_watching.length?`Rated: ${h.ratings_after_watching.join("; ")}`:"Zero ratings. Nothing finished.",h.never_watched.length?`Still waiting: ${h.never_watched.join(", ")}`:"Nothing left waiting"]); }
+let toolsOK=null;
+function canUseTools(){ if(toolsOK===null) toolsOK=getSample().then(s=>s&&s.limits?s.limits():null).then(l=>!!(l&&l.tools)).catch(()=>false); return toolsOK; }
+function courtTools(ta,tb,setStatus){ const byId=id=>[ta,tb].find(t=>t.id===+id);
+  return [
+   {name:"subpoena_title",description:"Subpoena the full court record of one submitted title: when it was saved, who recommended it and on which app (TikTok, Reels, Shorts), the caption, the want-to-watch score and the user's own reason for saving it. Returns that record and the exhibit letter it was filed under.",
+    inputSchema:{type:"object",properties:{title_id:{type:"integer",description:"The id of a submitted title"}},required:["title_id"]},
+    execute:async({title_id})=>{ const t=byId(title_id); if(!t) throw new Error("No such title in this case. Use one of the submitted ids.");
+      setStatus(`Judge Flix chose to subpoena the record of ${t.title}…`); await wait(500); const L=showTitleExhibit(t); return {exhibit:L,...titleRecord(t)}; }},
+   {name:"check_viewing_history",description:"Pull the user's viewing history for one genre: how many they saved, how many they actually watched, what they rated the ones they finished, and what is still waiting. Returns that history and the exhibit letter.",
+    inputSchema:{type:"object",properties:{genre:{type:"string",enum:GENRES}},required:["genre"]},
+    execute:async({genre})=>{ const g=GENRES.includes(String(genre))?String(genre):ta.genres[0];
+      setStatus(`Judge Flix chose to pull your ${g} viewing history…`); await wait(500); const L=showHistoryExhibit(g); return {exhibit:L,...genreHistory(g)}; }},
+  ]; }
+function trialPrompt(a,b,ta,tb,withTools){
+  const base=`You are Judge Flix, a dramatic courtroom judge in a movie app. Two people can't agree what to watch.
+Plaintiff ${a} submits "${ta.title}" (title_id ${ta.id}). Defendant ${b} submits "${tb.title}" (title_id ${tb.id}).
+Opening statements. ${a}: "${$("#argA").value}" ${b}: "${$("#argB").value}"
+Tone: ${LEVEL_RULES[level]}.`;
+  if(withTools) return base+`
+Before ruling, gather evidence: subpoena BOTH titles with subpoena_title, then check the viewing history of one genre that could decide the case. Call no more than 3 tools in total.
+Then rule with over-the-top legal drama in max 50 words, citing at least two exhibits by letter ("As Exhibit A shows…") and one specific fact from them. The loser's sentence is the mini game "Popcorn Panic" plus one silly couch chore.
+Your final message must be only JSON {"winner":"A" or "B","verdict":"...","sentence":"..."} where "A" means the plaintiff won.`;
+  return base+`
+Evidence: ${JSON.stringify({A:titleRecord(ta),B:titleRecord(tb),history:genreHistory(ta.genres[0])})}
+Rule with over-the-top legal drama in max 50 words, citing Exhibit A (plaintiff's title), Exhibit B (defendant's title) or Exhibit C (${ta.genres[0]} history) by letter. The loser's sentence is the mini game "Popcorn Panic" plus one silly couch chore.
+Reply with only JSON {"winner":"A" or "B","verdict":"...","sentence":"..."}`; }
+$("#trialBtn").onclick=async()=>{
+  const a=$("#pA").value.trim()||"Plaintiff", b=$("#pB").value.trim()||"Defendant";
+  const pick=v=>v.startsWith("f:")?filmItem([...SHELF,...EXTRA].find(x=>x.imdb===v.slice(2)),true):items.find(i=>i.id==v);
+  const vA=$("#tA").value, vB=$("#tB").value, ta=vA&&pick(vA), tb=vB&&pick(vB);
+  if(!ta||!tb){toast("Each side needs a title from the list.","Order in the court");return;}
+  if(vA===vB){toast(`You both picked ${ta.title}. Case dismissed. Go watch it.`,"Case dismissed");return;}
+  audio(); gavel(); speak("Order! Order in the court! The court will now examine the evidence.",{pitch:.7,rate:.95});
+  const V=$("#verdict"); V.hidden=false; V.innerHTML=`<div class="judge">Judge Flix</div><div class="gavel" id="courtStatus">The court is gathering evidence…</div><div class="exhibits" id="exhibits"></div>`;
+  const setStatus=t=>{const el=$("#courtStatus"); if(el)el.textContent=t;};
+  $("#trialBtn").disabled=true; V.scrollIntoView({behavior:"smooth",block:"start"});
+  await wait(900);
+  let r;
+  if(await canUseTools()){
+    setStatus("Judge Flix is deciding what evidence it needs…");
+    r=await askJSON(trialPrompt(a,b,ta,tb,true),{tools:courtTools(ta,tb,setStatus)});
+    if(r.err){ $("#exhibits").innerHTML=""; r=null; }
+  }
+  if(!r){ // no live tool use here: file the exhibits ourselves, then ask for a plain ruling
+    setStatus(`Subpoenaing the record of ${ta.title}…`); await wait(700); showTitleExhibit(ta);
+    setStatus(`Subpoenaing the record of ${tb.title}…`); await wait(700); showTitleExhibit(tb);
+    setStatus(`Pulling the ${ta.genres[0]} viewing history…`); await wait(700); showHistoryExhibit(ta.genres[0]);
+    setStatus("The court is deliberating…");
+    r=await askJSON(trialPrompt(a,b,ta,tb,false));
+  }
+  setStatus("The court has reached a verdict.");
+  await wait(600);
+  const out=(r.data&&r.data.verdict&&(r.data.winner==="A"||r.data.winner==="B"))?r.data:cannedVerdicts[vI++%cannedVerdicts.length](a,b,ta,tb);
+  const win=out.winner==="A"?ta:tb, winner=out.winner==="A"?a:b; loserName=out.winner==="A"?b:a; setTheme(win.genres[0]);
+  V.insertAdjacentHTML("beforeend",`<div class="judge">Judge Flix rules for ${esc(winner)}</div><q>${esc(out.verdict)}</q>
+   <div class="label">Tonight's feature</div><button class="option" id="winCard">${poster(win)}<div><h3 style="margin:0;font-size:15px">${esc(win.title)}</h3><div class="meta">${lenLabel(win)} · ${esc(win.where[0])}</div></div><span class="conf">›</span></button>
+   <div class="label">Sentence for ${esc(loserName)}</div><p style="margin:0">${esc(out.sentence)}</p>
+   <button class="btn danger wide" id="serve"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="4"/><path d="M8 10v4M6 12h4M15 11h.01M17 13h.01"/></svg>Serve the sentence</button>`);
+  gavel(); speak(`The court rules for ${winner}. ${out.verdict} ${loserName}, your sentence: ${out.sentence}`,{pitch:.7,rate:.95});
+  $("#trialBtn").disabled=false;
+  sharePlaintiff({verdict:{winner:String(winner).slice(0,40),text:String(out.verdict).slice(0,700),sentence:String(out.sentence).slice(0,400),loser:String(loserName).slice(0,40),title:String(win.title).slice(0,120)}});
+  $("#winCard").onclick=()=>{ if(!items.includes(win)){ win.saved="just now"; items.unshift(win); renderList(); toast(`${win.title} is now on your list. The court has spoken.`,"Saved"); } openDetail(win.id); };
+  $("#serve").onclick=()=>go("game");
+};
+
+/* ---------- court invites: the defendant joins from their own phone ----------
+   Uses the artifact's "room" ability: both pages must be open at the same time,
+   and nothing is stored. Each case gets its own room named by the invite code. */
+const ARTIFACT_URL="https://claude.ai/artifact/1PZ93V3qrVbPDEeHLDC9Dh";
+let roomP=null, caseRoom=null, remoteB=null, lastOpts="";
+function getRoom(){ if(!roomP) roomP=(window.claude&&window.claude.use)?window.claude.use("room").catch(()=>null):Promise.resolve(null); return roomP; }
+async function openCase(code,onChange){ const room=await getRoom(); if(!room) return null;
+  try{ caseRoom=await room.join(code); }catch(e){ caseRoom=null; return null; }
+  caseRoom.onPeers(onChange,()=>onChange()); return caseRoom; }
+const selText=sel=>{ const o=$(sel).selectedOptions[0]; return o?o.textContent:""; };
+const displayName=(n,fb)=>{ n=String(n||"").trim().slice(0,40); return n&&!/^(me|plaintiff|defendant|my date)$/i.test(n)?n:fb; };
+function sharePlaintiff(extra){ if(!caseRoom||caseRole!=="plaintiff") return;
+  const opts=[...$("#tB").options].map(o=>({v:o.value,t:o.textContent.slice(0,60)})).slice(0,40);
+  caseRoom.presence({role:"plaintiff",name:($("#pA").value.trim()||"Plaintiff").slice(0,40),pick:selText("#tA").slice(0,80),options:opts,...(extra||{})}).catch(()=>{}); }
+function applyRemoteB(){ const on=!!remoteB; ["#pB","#tB","#argB"].forEach(k=>{ $(k).disabled=on; $(k).classList.toggle("remote",on); });
+  if(on){ $("#pB").value=remoteB.name; $("#tB").value=remoteB.v; $("#argB").value=remoteB.arg; } if($("#fightA").children.length) renderFighters(); }
+let caseRole="";
+function setInvite(t){ $("#inviteStatus").textContent=t; }
+function onPlaintiffPeers(){ if(!caseRoom) return;
+  const d=caseRoom.peers().find(p=>!p.isMe&&p.presence&&p.presence.role==="defendant");
+  if(!d){ if(remoteB){ remoteB=null; applyRemoteB(); setInvite("The defendant closed the page. Their answers were cleared. Send the link again, or fill in their side yourself."); }
+    else setInvite("Waiting for the defendant to open the link. Keep this page open."); return; }
+  const pr=d.presence, name=displayName(pr.name,"The defendant");
+  if(!pr.submitted){ setInvite(`${name==="The defendant"?"The defendant":name} is in the courtroom and choosing a pick…`); return; }
+  const v=String(pr.pick||""), ok=[...$("#tB").options].some(o=>o.value===v);
+  if(!ok){ setInvite(`${name} picked something that isn't on the list. Ask them to pick again.`); return; }
+  remoteB={name:displayName(pr.name,"Defendant"),v,arg:String(pr.statement||"").slice(0,400)}; applyRemoteB();
+  setInvite(`✓ ${remoteB.name} is in with ${selText("#tB")}. Begin the trial when you're ready.`); }
+$("#inviteBtn").onclick=async()=>{ const box=$("#inviteBox"); box.hidden=false; $("#linkRow").hidden=true; setInvite("Opening the courtroom…"); $("#inviteBtn").disabled=true;
+  const code="case-"+Array.from({length:6},()=>"abcdefghjkmnpqrstuvwxyz23456789"[Math.floor(Math.random()*31)]).join("");
+  caseRole="plaintiff"; const r=await openCase(code,onPlaintiffPeers);
+  $("#inviteBtn").disabled=false;
+  if(!r){ caseRole=""; setInvite("Invites can't connect in this view. They work when you both open the demo signed in to Claude (the app or claude.ai) and you've shared the demo with the other person. For now, pass the phone and fill in both sides."); return; }
+  $("#inviteLabel").textContent="New invite link"; $("#linkRow").hidden=false; $("#inviteLink").value=`${ARTIFACT_URL}#${code}`; setShareLinks(); $("#shareRow").hidden=true; $("#shareInvite").setAttribute("aria-expanded","false");
+  remoteB=null; applyRemoteB(); sharePlaintiff(); onPlaintiffPeers(); };
+function inviteMessage(){ const n=displayName($("#pA").value,"Someone"); return `${n==="Someone"?"You've":n+" has"} taken you to Decision Court on Q'd. Open this link to enter your pick and your opening statement. Judge Flix is waiting:`; }
+function setShareLinks(){ const url=$("#inviteLink").value, msg=inviteMessage(), both=`${msg} ${url}`;
+  $("#shWhatsApp").href="https://wa.me/?text="+encodeURIComponent(both);
+  $("#shTelegram").href="https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent(msg);
+  $("#shSms").href="sms:?&body="+encodeURIComponent(both);
+  $("#shEmail").href="mailto:?subject="+encodeURIComponent("You've been summoned to Decision Court")+"&body="+encodeURIComponent(both); }
+$("#shareInvite").onclick=async()=>{ setShareLinks(); const url=$("#inviteLink").value;
+  if(navigator.share){ try{ await navigator.share({title:"Decision Court",text:inviteMessage(),url}); return; }catch(e){ if(e&&e.name==="AbortError") return; } }
+  const r=$("#shareRow"); r.hidden=!r.hidden; $("#shareInvite").setAttribute("aria-expanded",String(!r.hidden)); };
+["#shSms","#shEmail"].forEach(k=>$(k).addEventListener("click",()=>setTimeout(()=>toast("If nothing opened, tap Copy link and paste it into your message.","Tip"),900)));
+$("#pA").addEventListener("input",()=>{ if($("#inviteLink").value) setShareLinks(); });
+$("#copyInvite").onclick=async()=>{ const t=$("#inviteLink").value; try{ await navigator.clipboard.writeText(t); toast("Invite link copied. Send it in a text or DM.","Copied"); }catch(e){ $("#inviteLink").select(); toast("Copy the link from the box.","Almost"); } };
+$("#courtFind").addEventListener("input",()=>renderSelects());
+["#pA","#tA"].forEach(k=>$(k).addEventListener(k==="#pA"?"input":"change",()=>sharePlaintiff()));
+
+/* the defendant's side, when the page opens from an invite link */
+function renderDefendant(){ if(!caseRoom) return;
+  const p=caseRoom.peers().find(x=>!x.isMe&&x.presence&&x.presence.role==="plaintiff");
+  if(!p){ $("#summonsWho").textContent="Waiting for the person who invited you. They need to keep Decision Court open on their phone."; $("#dSubmit").disabled=true; return; }
+  const pr=p.presence, who=displayName(pr.name,"Your friend"), their=String(pr.pick||"").slice(0,80);
+  $("#summonsWho").textContent=`${who} has taken you to Decision Court${their?` and wants to watch ${their}`:""}. Enter your name, your pick and your opening statement.`;
+  const opts=Array.isArray(pr.options)?pr.options.slice(0,40).filter(o=>o&&typeof o.v==="string"):[], key=JSON.stringify(opts);
+  if(key!==lastOpts){ lastOpts=key; const keep=$("#dPick").value; $("#dPick").innerHTML=opts.map(o=>`<option value="${esc(o.v)}">${esc(String(o.t||"").slice(0,60))}</option>`).join(""); if(opts.some(o=>o.v===keep))$("#dPick").value=keep; }
+  $("#dSubmit").disabled=!opts.length;
+  const vd=pr.verdict; if(vd&&typeof vd==="object"){ const V=$("#dVerdict"), html=`<div class="judge">Judge Flix rules for ${esc(String(vd.winner||"").slice(0,40))}</div><q>${esc(String(vd.text||"").slice(0,700))}</q><div class="label">Tonight's feature</div><p style="margin:0">${esc(String(vd.title||"").slice(0,120))}</p><div class="label">Sentence for ${esc(String(vd.loser||"").slice(0,40))}</div><p style="margin:0">${esc(String(vd.sentence||"").slice(0,400))}</p>`;
+    if(V.dataset.last!==html){ V.dataset.last=html; V.innerHTML=html; V.hidden=false; gavel(); speak(`The court rules for ${vd.winner}. ${vd.text}`,{pitch:.7,rate:.95}); V.scrollIntoView({behavior:"smooth",block:"start"}); } } }
+$("#dSubmit").onclick=()=>{ const name=$("#dName").value.trim(); if(!name){ toast("Enter your name so the judge knows who you are.","Name needed"); $("#dName").focus(); return; }
+  audio(); caseRoom&&caseRoom.presence({role:"defendant",submitted:true,name:name.slice(0,40),pick:$("#dPick").value.slice(0,40),statement:$("#dArg").value.slice(0,400)}).catch(()=>{});
+  $("#dSubmitTxt").textContent="Update my answers"; $("#dStatus").textContent="Submitted. Judge Flix rules on the other person's screen, and the verdict shows up here. You can still change your answers until the trial starts."; };
+async function startDefendant(code){ caseRole="defendant"; go("court"); $("#courtPanel").hidden=true; $("#verdict").hidden=true; $("#summons").hidden=false;
+  const r=await openCase(code,renderDefendant);
+  if(!r){ $("#summonsWho").textContent="This invite couldn't connect. Invites work when you open the demo signed in to Claude (the app or claude.ai) and the person who invited you has shared the demo with you. Otherwise, ask them to pass you their phone."; return; }
+  r.presence({role:"defendant",submitted:false}).catch(()=>{}); renderDefendant(); }
+const caseCode=(location.hash.match(/^#(case-[a-z0-9]{6})$/)||[])[1];
+
+/* ---------- game ---------- */
+const cv=$("#cv"); cv.width=800; cv.height=840; const cx=cv.getContext("2d"); cx.scale(2,2); let G=null;
+function prepGame(){ const g=favGenre(); setTheme(g);
+  $("#gameTitle").textContent=loserName?`${loserName}'s sentence: Popcorn Panic`:"Popcorn Panic";
+  $("#gameSub").textContent=`Catch the popcorn in your bucket, dodge the burnt kernels. 20 seconds. Themed to your most-saved genre: ${g}.`;
+  drawIdle(); }
+function accent(){ return getComputedStyle(document.body).getPropertyValue("--accent").trim()||"#E9A93B"; }
+
+/* Popcorn sprites: each piece is a lumpy cluster of puffs with a golden hull, drawn once at 2x and reused */
+function makeKernel(burnt){ const c=document.createElement("canvas"); c.width=c.height=88; const g=c.getContext("2d"); g.scale(2,2); g.translate(22,22);
+  const R=Math.random, n=5+Math.floor(R()*3), lobes=[];
+  for(let k=0;k<n;k++){ const a=k/n*Math.PI*2+R()*.6, r=5+R()*4; lobes.push({x:Math.cos(a)*r,y:Math.sin(a)*r*.85,r:6.5+R()*3}); }
+  lobes.push({x:R()*2-1,y:R()*2-1,r:8});
+  const [hi,mid,lo]=burnt?["#5A4130","#3A2A1E","#1C140E"]:["#FFFDF4","#FFF1CF","#E9CC8E"];
+  for(const l of lobes){ g.beginPath(); g.fillStyle=lo; g.arc(l.x+1,l.y+1.6,l.r,0,7); g.fill(); }
+  for(const l of lobes){ const gr=g.createRadialGradient(l.x-l.r*.35,l.y-l.r*.4,1,l.x,l.y,l.r); gr.addColorStop(0,hi); gr.addColorStop(1,mid);
+    g.beginPath(); g.fillStyle=gr; g.arc(l.x,l.y,l.r,0,7); g.fill(); }
+  if(burnt){ g.fillStyle="#9A3F14"; for(let k=0;k<4;k++){ g.beginPath(); g.arc(R()*14-7,R()*14-7,1.1,0,7); g.fill(); } }
+  else { g.fillStyle="rgba(245,196,81,.55)"; for(let k=0;k<3;k++){ g.beginPath(); g.arc(R()*14-7,R()*12-6,1.8+R()*1.5,0,7); g.fill(); }
+    g.fillStyle="#C9812E"; g.beginPath(); g.ellipse(3,8,4.2,2.6,.5,0,7); g.fill(); g.fillStyle="#E4A04A"; g.beginPath(); g.ellipse(2.2,7.3,2,1.1,.5,0,7); g.fill(); }
+  return c; }
+const GOOD=[0,1,2,3,4].map(()=>makeKernel(false)), BURNT=[0,1].map(()=>makeKernel(true));
+function drawKernel(spr,x,y,rot,s=1){ cx.save(); cx.translate(x,y); cx.rotate(rot); cx.drawImage(spr,-22*s,-22*s,44*s,44*s); cx.restore(); }
+
+function drawStage(){ const bg=cx.createLinearGradient(0,0,0,420); bg.addColorStop(0,"#241910"); bg.addColorStop(.55,"#0E0B09"); bg.addColorStop(1,"#0E0B09");
+  cx.fillStyle=bg; cx.fillRect(0,0,400,420);
+  const glow=cx.createRadialGradient(200,-40,10,200,-40,260); glow.addColorStop(0,"rgba(233,169,59,.22)"); glow.addColorStop(1,"rgba(233,169,59,0)"); cx.fillStyle=glow; cx.fillRect(0,0,400,220);
+  cx.fillStyle="#17110C"; for(let x=-10;x<420;x+=46){ cx.beginPath(); cx.moveTo(x,420); cx.lineTo(x,392); cx.quadraticCurveTo(x+20,376,x+40,392); cx.lineTo(x+40,420); cx.fill(); } }
+
+/* Classic red-and-white striped bucket, tapered, with a heap of caught popcorn on top */
+const BT=344, BB=414, TW=46, BW=33;
+function bucketHeap(){ const h=[]; for(let k=0;k<22;k++){ const row=Math.floor(k/6); h.push({dx:(k%6-2.5)*13+(Math.random()*6-3)+(row%2?6:0), dy:-4-row*9-Math.random()*4, rot:Math.random()*6, spr:GOOD[k%GOOD.length]}); } return h; }
+let idleHeap=bucketHeap();
+function drawBucket(x,heap,shown,jig=0){ x+=jig;
+  for(let k=Math.min(shown,heap.length)-1;k>=0;k--){ const p=heap[k]; drawKernel(p.spr,x+p.dx,BT+p.dy,p.rot,.8); }
+  cx.save(); cx.beginPath(); cx.moveTo(x-TW,BT); cx.lineTo(x+TW,BT); cx.lineTo(x+BW,BB); cx.lineTo(x-BW,BB); cx.closePath(); cx.clip();
+  const n=7; for(let k=0;k<n;k++){ cx.beginPath(); cx.fillStyle=k%2?"#F6EEDF":"#D7322B";
+    cx.moveTo(x-TW+k*2*TW/n,BT); cx.lineTo(x-TW+(k+1)*2*TW/n,BT); cx.lineTo(x-BW+(k+1)*2*BW/n,BB); cx.lineTo(x-BW+k*2*BW/n,BB); cx.fill(); }
+  const sh=cx.createLinearGradient(x-TW,0,x+TW,0); sh.addColorStop(0,"rgba(0,0,0,.35)"); sh.addColorStop(.35,"rgba(0,0,0,0)"); sh.addColorStop(.7,"rgba(255,255,255,.08)"); sh.addColorStop(1,"rgba(0,0,0,.4)");
+  cx.fillStyle=sh; cx.fillRect(x-TW,BT,TW*2,BB-BT); cx.restore();
+  cx.fillStyle="#1A1004"; cx.beginPath(); cx.ellipse(x,BT+30,22,10,0,0,7); cx.fill();
+  cx.fillStyle=G?G.acc:accent(); cx.beginPath(); cx.ellipse(x,BT+30,20,8.5,0,0,7); cx.fill();
+  cx.fillStyle="#1A1004"; cx.font="400 9px Limelight, Georgia, serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("Q'D",x,BT+30.5);
+  cx.fillStyle="#E8DCC6"; cx.beginPath(); cx.roundRect(x-TW-3,BT-3,TW*2+6,7,3.5); cx.fill();
+  cx.fillStyle="rgba(0,0,0,.18)"; cx.fillRect(x-TW-1,BT+2,TW*2+2,2); cx.textBaseline="alphabetic"; }
+
+function drawIdle(){ drawStage();
+  [[90,120,0,.4],[300,90,1,2.1],[200,210,2,4],[130,260,0,1.3],[320,230,1,5.2]].forEach(([x,y,k,r])=>drawKernel(k===1&&y===230?BURNT[0]:GOOD[k],x,y,r));
+  drawBucket(200,idleHeap,6);
+  cx.fillStyle=accent(); cx.font="700 18px Instrument Sans, sans-serif"; cx.textAlign="center"; cx.fillText("Tap Start. Slide the bucket to catch.",200,48); }
+function pos(e){ const r=cv.getBoundingClientRect(); return (e.clientX-r.left)/r.width*400; }
+cv.addEventListener("pointermove",e=>{if(G)G.bx=Math.max(TW,Math.min(400-TW,pos(e)));});
+cv.addEventListener("pointerdown",e=>{if(G)G.bx=Math.max(TW,Math.min(400-TW,pos(e)));});
+$("#gStart").onclick=()=>{ G={bx:200,drops:[],fx:[],score:0,t0:performance.now(),last:0,acc:accent(),heap:bucketHeap(),shown:4,jig:0}; $("#gStart").disabled=true; requestAnimationFrame(tick); };
+function tick(now){ if(!G)return; const el=(now-G.t0)/1000, left=Math.max(0,20-el);
+  if(now-G.last>380-Math.min(220,el*10)){ G.last=now; const bad=Math.random()<.25;
+    G.drops.push({x:24+Math.random()*352,y:-16,v:2+Math.random()*2+el*.12,bad,rot:Math.random()*6,spin:(Math.random()-.5)*.12,spr:bad?BURNT[Math.floor(Math.random()*2)]:GOOD[Math.floor(Math.random()*5)]}); }
+  drawStage();
+  for(const d of G.drops){ d.y+=d.v; d.rot+=d.spin;
+    if(d.bad){ const gl=cx.createRadialGradient(d.x,d.y,2,d.x,d.y,20); gl.addColorStop(0,"rgba(229,83,61,.45)"); gl.addColorStop(1,"rgba(229,83,61,0)"); cx.fillStyle=gl; cx.fillRect(d.x-20,d.y-20,40,40);
+      cx.fillStyle="rgba(150,140,130,.18)"; for(let k=1;k<4;k++){ cx.beginPath(); cx.arc(d.x+Math.sin(d.y/9+k)*3,d.y-k*9,3+k*1.4,0,7); cx.fill(); } }
+    drawKernel(d.spr,d.x,d.y,d.rot);
+    if(d.y>BT-14&&d.y<BT+10&&Math.abs(d.x-G.bx)<TW){ d.hit=true;
+      if(d.bad){ G.score-=3; G.jig=8; G.shown=Math.max(0,G.shown-2); G.fx.push({x:d.x,y:BT-20,t:"-3",c:"#E5533D",a:1}); }
+      else { G.score+=1; G.shown=Math.min(G.heap.length,G.shown+1); G.fx.push({x:d.x,y:BT-20,t:"+1",c:G.acc,a:1}); } } }
+  G.drops=G.drops.filter(d=>!d.hit&&d.y<450);
+  G.jig=G.jig>0?-(G.jig-1):G.jig<0?-(G.jig+1):0;
+  drawBucket(G.bx,G.heap,G.shown,G.jig);
+  cx.textAlign="center"; cx.font="700 18px Courier Prime, monospace"; for(const f of G.fx){ f.y-=1.2; f.a-=.03; cx.globalAlpha=Math.max(0,f.a); cx.fillStyle=f.c; cx.fillText(f.t,f.x,f.y); } cx.globalAlpha=1; G.fx=G.fx.filter(f=>f.a>0);
+  $("#gScore").textContent="Score "+G.score; $("#gTime").textContent=Math.ceil(left)+"s";
+  if(left<=0){ const sc=G.score; G=null; $("#gStart").disabled=false; $("#gStartTxt").textContent="Play again";
+    cx.fillStyle="rgba(14,11,9,.85)";cx.fillRect(0,0,400,420); cx.fillStyle=accent(); cx.textAlign="center"; cx.font="400 34px Limelight, Georgia, serif"; cx.fillText(sc>=15?"Sentence served":"Try again",200,195); cx.fillStyle="#F3E9D8"; cx.font="500 16px Instrument Sans, sans-serif"; cx.fillText(`Score ${sc}${sc>=15?". The court is satisfied.":". The court demands 15."}`,200,228);
+    if(sc>=15)loserName=""; return; }
+  requestAnimationFrame(tick); }
+
+/* ---------- boot ---------- */
+document.documentElement.lang="en";
+setTheme(fGenre==="All"?"":fGenre); renderList();
+if(caseCode) startDefendant(caseCode);
+</script>
+
+</body></html>
